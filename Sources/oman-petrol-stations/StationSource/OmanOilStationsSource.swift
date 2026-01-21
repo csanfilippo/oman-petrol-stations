@@ -52,11 +52,21 @@ final class OmanOilStationsSource: PetrolStationsSource {
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
         
-        let (_, _) = try await PetrolStationSourceError.uplift {
+        let (data, _) = try await PetrolStationSourceError.uplift {
             try await self.session.data(from: self.source)
         }
         
-        return []
+        let stations: [OmanOilPetrolStation] = try PetrolStationSourceError.uplift {
+            try JSONDecoder().decode([OmanOilPetrolStation].self, from: data)
+        }
+        
+        return stations.compactMap { station -> PetrolStation? in
+            guard let latitude = Double(station.latitude), let longitude = Double(station.longitude) else {
+                return nil
+            }
+            
+            return .init(id: String(describing: station.id), brand: "Omain Oil", name: station.name, location: .init(latitude: latitude, longitude: longitude))
+        }
     }
     
     
