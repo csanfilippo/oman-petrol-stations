@@ -75,7 +75,7 @@ final class KMLPetrolStationSerializer: PetrolStationSerializer {
                     <name>\(name)</name>
                     <description>\(escape(description))</description>
                     <Point>
-                        <coordinates>\(lon),\(lat)</coordinates>
+                        <coordinates>\(lat),\(lon)</coordinates>
                     </Point>
                 </Placemark>
             """

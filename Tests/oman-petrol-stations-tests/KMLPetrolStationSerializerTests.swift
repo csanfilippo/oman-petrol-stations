@@ -65,7 +65,7 @@ struct KMLPetrolStationSerializerTests {
         // Assert
         #expect(storage.storage.contains("<Placemark>"))
         #expect(storage.storage.contains("<name>Test Station</name>"))
-        #expect(storage.storage.contains("<coordinates>3.0,2.0</coordinates>"))
+        #expect(storage.storage.contains("<coordinates>2.0,3.0</coordinates>"))
         #expect(storage.storage.contains("</Placemark>"))
     }
 
