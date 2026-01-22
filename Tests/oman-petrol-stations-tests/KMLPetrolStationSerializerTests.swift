@@ -68,6 +68,25 @@ struct KMLPetrolStationSerializerTests {
         #expect(storage.storage.contains("<coordinates>2.0,3.0</coordinates>"))
         #expect(storage.storage.contains("</Placemark>"))
     }
+    
+    @Test("station name are capitalized")
+    func testCapitalizeStationName() throws {
+        // Arrange
+        let stations = [
+            PetrolStation(id: "1", brand: "Shell", name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
+        ]
+        let serializer = KMLPetrolStationSerializer()
+        let storage = InspectableStorage()
+
+        // Act
+        try serializer.save(stations: stations, into: storage)
+
+        // Assert
+        #expect(storage.storage.contains("<Placemark>"))
+        #expect(storage.storage.contains("<name>Test Station</name>"))
+        #expect(storage.storage.contains("<coordinates>2.0,3.0</coordinates>"))
+        #expect(storage.storage.contains("</Placemark>"))
+    }
 
     @Test("escaping of special characters in name and brand")
     func testEscapingSpecialCharactersInNameAndBrand() throws {

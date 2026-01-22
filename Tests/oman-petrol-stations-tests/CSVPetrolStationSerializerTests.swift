@@ -64,4 +64,19 @@ struct CSVPetrolStationSerializerTests {
         
         #expect(inspectableStorage.storage == expected)
     }
+    
+    @Test("station names are capitalized")
+    func capitalizedStationName() throws {
+        let emptyArray: [PetrolStation] = [.init(id: "1", brand: "Shell", name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))]
+        let serializer = CSVPetrolStationSerializer()
+        let inspectableStorage = InspectableStorage()
+        try serializer.save(stations: emptyArray, into: inspectableStorage)
+        let expected = """
+            Name,Brand,Latitude,Longitude
+            Test,Shell,2.200000,3.200000
+            """
+        
+        
+        #expect(inspectableStorage.storage == expected)
+    }
 }

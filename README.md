@@ -13,15 +13,16 @@ swift run oman-petrol-stations --help
 
 OVERVIEW: Fetches petrol stations in Oman and exports them to a file.
 
-This tool downloads station data from multiple providers and serializes it into a chosen output format (KML or CSV). Use --format to select the
-format and --output-file-path to specify where to save the file.
+This tool downloads station data from multiple providers and serializes it into a chosen output format (KML or CSV)
 
-USAGE: oman-petrol-stations --output-file-path <output-file-path> [--format <format>]
+USAGE: oman-petrol-stations --output-file-path <output-file-path> [--format <format>] [--petrol-company-list <petrol-company-list>]
 
 OPTIONS:
   --output-file-path <output-file-path>
                           The path of output file
   --format <format>       The format of output file (values: csv, kml; default: kml)
+  --petrol-company-list <petrol-company-list>
+                          Comma-separated list of petrol companies (default: shell,almaha,oomco)
   --version               Show the version.
   -h, --help              Show help information.
 ```
