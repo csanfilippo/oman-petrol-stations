@@ -26,8 +26,25 @@ import Foundation
 
 @resultBuilder
 struct FetchAllStationsBuilder {
-    static func buildBlock(_ components: PetrolStationsSource...) -> [PetrolStationsSource] {
-        return Array(components)
+    
+    static func buildBlock(_ components: [PetrolStationsSource]...) -> [PetrolStationsSource] {
+        components.flatMap { $0 }
+    }
+
+    static func buildExpression(_ expression: PetrolStationsSource) -> [PetrolStationsSource] {
+        [expression]
+    }
+
+    static func buildOptional(_ component: [PetrolStationsSource]?) -> [PetrolStationsSource] {
+        component ?? []
+    }
+
+    static func buildEither(first component: [PetrolStationsSource]) -> [PetrolStationsSource] {
+        component
+    }
+
+    static func buildEither(second component: [PetrolStationsSource]) -> [PetrolStationsSource] {
+        component
     }
 }
 

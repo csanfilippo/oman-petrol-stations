@@ -76,4 +76,54 @@ struct FetchAllTests {
         #expect(stations == expectedStations)
         
     }
+    
+    @Test(
+        "the resulting array after a fetch should contain only the stations from the sources that are conditionally passed as arguments",
+        arguments: [
+            (true, [
+                PetrolStation(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))
+                    ]
+            ),
+            (false, [
+                PetrolStation(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
+                PetrolStation(id: "1", brand: "OmainOil", name: "OmanStation", location: .init(latitude: 22, longitude: 22))
+                    ]
+            ),
+            ]
+    )
+    func fetchConditionally(_ include: Bool, _ expected: [PetrolStation]) async throws {
+        let source1 = DummySource(injectedStations: [.init(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
+        let source2 = DummySource(injectedStations: [.init(id: "1", brand: "OmainOil", name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
+        let stations = try await fetchAllFrom {
+            if include {
+                source1
+            } else {
+                source1
+                source2
+            }
+        }
+        
+        #expect(stations == expected)
+        
+    }
+    
+    @Test(
+        "the resulting array after a fetch should contain only the stations from the sources that are conditionally passed as arguments",
+        arguments: [
+            (true, [PetrolStation(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))]),
+            (false, [])
+        ]
+    )
+    func fetchWithSimpleIf(_ include: Bool, _ expected: [PetrolStation]) async throws {
+        let source = DummySource(injectedStations: [.init(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
+        
+        let stations = try await fetchAllFrom {
+            if include {
+                source
+            }
+        }
+        
+        #expect(stations == expected)
+        
+    }
 }

@@ -39,6 +39,44 @@ enum OutputFormat: ExpressibleByArgument, CaseIterable {
     case kml
 }
 
+enum PetrolCompany: String, ExpressibleByArgument, CaseIterable {
+    case oomco
+    case shell
+    case almaha
+    
+    init?(argument: String) {
+        switch argument.lowercased() {
+        case "oomco": self = .oomco
+        case "shell": self = .shell
+        case "almaha": self = .almaha
+        default: return nil
+        }
+    }
+}
+
+struct PetrolCompanyList: ExpressibleByArgument, ExpressibleByArrayLiteral {
+    
+    let companies: Set<PetrolCompany>
+
+    init?(argument: String) {
+        let values = argument.split(separator: ",").compactMap {
+            PetrolCompany(rawValue: String($0).lowercased())
+        }
+        
+        if values.isEmpty { return nil }
+        self.companies = Set(values)
+    }
+    
+    init(arrayLiteral elements: PetrolCompany...) {
+        self.companies = Set(elements)
+    }
+    
+    var defaultValueDescription: String {
+        companies.map { String(describing: $0) }.joined(separator: ",")
+    }
+}
+
+
 @main
 struct oman_petrol_stations: AsyncParsableCommand {
     
@@ -47,29 +85,36 @@ struct oman_petrol_stations: AsyncParsableCommand {
         abstract: "Fetches petrol stations in Oman and exports them to a file.",
         discussion: """
         This tool downloads station data from multiple providers and serializes it \
-        into a chosen output format (KML or CSV). Use --format to select the format \
-        and --output-file-path to specify where to save the file.
+        into a chosen output format (KML or CSV)
         """,
-        version: "1.0.0"
+        version: "1.1.0"
     )
     
-    @Option(name: .long, help: "The path of output file")
+    @Option(help: "The path of output file")
     var outputFilePath: String
     
-    @Option(name: .long, help: "The format of output file")
+    @Option(help: "The format of output file")
     var format: OutputFormat = .kml
     
+    @Option(help: "Comma-separated list of petrol companies")
+    var petrolCompanyList: PetrolCompanyList = [.shell, .oomco, .almaha]
+    
     mutating func run() async throws {
-		let session = URLSession.shared
         
-        let omainOilSource = OmanOilStationsSource(session: session)
-        let shellSource = ShellStationsSource(session: session)
-        let alMahaSource = AlMahaStationsSource(session: session)
-
+        let session = URLSession.shared
+        
         let stations = try await fetchAllFrom {
-            omainOilSource
-            shellSource
-            alMahaSource
+            if petrolCompanyList.companies.contains(.almaha) {
+                AlMahaStationsSource(session: session)
+            }
+            
+            if petrolCompanyList.companies.contains(.oomco) {
+                OmanOilStationsSource(session: session)
+            }
+            
+            if petrolCompanyList.companies.contains(.shell) {
+                ShellStationsSource(session: session)
+            }
         }
         
         let serializer = serializerFor(format.asSerializationFormat)
