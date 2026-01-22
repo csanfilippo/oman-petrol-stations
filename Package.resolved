@@ -1,5 +1,5 @@
 {
-  "originHash" : "9c6f65db404b0b2419978ea1da60c744de37d47c851879137662863099f07746",
+  "originHash" : "4e425918bee49dc8824c32713fc02dcb7f5e5c722f8ffdd7501636c66dbb9b3c",
   "pins" : [
     {
       "identity" : "altai",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "a23a4584f8e7de07cab420ae4d51eee553dd988d",
         "version" : "6.0.1"
+      }
+    },
+    {
+      "identity" : "replay",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattt/Replay.git",
+      "state" : {
+        "revision" : "c15f853f689e111e50813ae4b18877a0f10b86f6",
+        "version" : "0.3.1"
       }
     },
     {

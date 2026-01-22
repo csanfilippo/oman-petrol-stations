@@ -12,6 +12,7 @@ let package = Package(
         .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "6.0.1"),
         .package(url: "https://github.com/csanfilippo/altai", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
+        .package(url: "https://github.com/mattt/Replay.git", from: "0.3.0")
     ],
     targets: [
         .executableTarget(
@@ -27,7 +28,10 @@ let package = Package(
         ),
         .testTarget(
             name: "oman-petrol-stations-tests",
-            dependencies: ["oman-petrol-stations"]
+            dependencies: [
+                "oman-petrol-stations",
+                .product(name: "Replay", package: "Replay")
+            ]
         )
     ],
     swiftLanguageModes: [.v6]
