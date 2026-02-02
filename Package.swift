@@ -31,6 +31,9 @@ let package = Package(
             dependencies: [
                 "oman-petrol-stations",
                 .product(name: "Replay", package: "Replay")
+            ],
+            resources: [
+                .copy("Replays")
             ]
         )
     ],
