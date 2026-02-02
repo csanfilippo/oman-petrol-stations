@@ -28,16 +28,31 @@ import Foundation
 
 @testable import oman_petrol_stations
 
-@Suite(.playbackIsolated(replaysFrom: Bundle.module))
+@Suite("ShellStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct ShellStationsSourceTests {
     
-    @Test(.replay("fetchShellStations"))
-    func prova() async throws {
+    @Test("should return the correct stations", .replay("fetchShellStations"))
+    func happyPath() async throws {
         let source = ShellStationsSource(session: .shared)
         
         let stations = try await source.getAllPetrolStations()
         
-        #expect(stations.count == 83)
+        let setOfIds = stations.uniqueValues(of: \.id)
+        let setOfNames = stations.uniqueValues(of: \.name)
         
+        #expect(stations.count == 2)
+        
+        #expect(setOfIds.contains("12662228"))
+        #expect(setOfIds.contains("12540496"))
+        
+        #expect(setOfNames.contains("SAIH AL RAWL SS"))
+        #expect(setOfNames.contains("ZAMAIM SS"))
+        
+    }
+}
+
+private extension Array where Element == PetrolStation {
+    func uniqueValues<T>(of keyPath: KeyPath<Element, T>) -> Set<T> {
+        Set(map { $0[keyPath: keyPath] })
     }
 }
