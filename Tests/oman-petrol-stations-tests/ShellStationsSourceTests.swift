@@ -31,7 +31,14 @@ import Foundation
 @Suite("ShellStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct ShellStationsSourceTests {
     
-    @Test("should return the correct stations", .replay("fetchShellStations", matching: [.path], filters: [], scope: .test))
+    @Test(
+        "should return the correct stations",
+            .replay(
+                "fetchShellStations",
+                matching: [.path],
+                filters: [],
+                scope: .test)
+    )
     func happyPath() async throws {
         let source = ShellStationsSource(session: Replay.session)
         
