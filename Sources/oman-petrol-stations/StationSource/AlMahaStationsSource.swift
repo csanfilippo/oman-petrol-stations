@@ -40,17 +40,7 @@ final class AlMahaStationsSource: PetrolStationsSource {
         
         request.httpMethod = "POST"
         
-        guard let (data, response) = try? await session.data(for: request) else {
-            throw .invalidResponse
-        }
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw .invalidResponse
-        }
-
-        guard (200...299).contains(httpResponse.statusCode) else {
-            throw .serverError
-        }
+        let data = try await performRequest(request, session: session)
         
         guard let html = String(data: data, encoding: .utf8) else {
             throw .invalidData

@@ -22,7 +22,6 @@
  SOFTWARE.
  */
 
-import altai
 import Foundation
 
 private struct OmanOilPetrolStation: Decodable {
@@ -52,17 +51,8 @@ final class OmanOilStationsSource: PetrolStationsSource {
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
         
-        guard let (data, response) = try? await self.session.data(from: self.source) else {
-            throw .invalidResponse
-        }
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw .invalidResponse
-        }
-
-        guard (200...299).contains(httpResponse.statusCode) else {
-            throw .serverError
-        }
+        let request = URLRequest(url: source)
+        let data = try await performRequest(request, session: session)
         
         guard let stations: [OmanOilPetrolStation] = try? JSONDecoder().decode([OmanOilPetrolStation].self, from: data) else {
             throw .invalidData

@@ -48,3 +48,21 @@ extension PetrolStationSourceError: Equatable {
 protocol PetrolStationsSource: Sendable {
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation]
 }
+
+extension PetrolStationsSource {
+    func performRequest(_ request: URLRequest, session: URLSession) async throws(PetrolStationSourceError) -> Data {
+        guard let (data, response) = try? await session.data(for: request) else {
+            throw .invalidResponse
+        }
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw .invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw .serverError
+        }
+        
+        return data
+    }
+}
