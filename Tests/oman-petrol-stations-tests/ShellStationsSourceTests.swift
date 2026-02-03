@@ -28,7 +28,6 @@ import Foundation
 
 @testable import oman_petrol_stations
 
-
 @Suite("ShellStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct ShellStationsSourceTests {
     
