@@ -75,7 +75,7 @@ final class OmanOilStationsSource: PetrolStationsSource {
             
             return .init(
                 id: String(describing: station.id),
-                brand: "Omain Oil",
+                brand: "Oman Oil",
                 name: station.name,
                 location: .init(latitude: latitude, longitude: longitude)
             )
