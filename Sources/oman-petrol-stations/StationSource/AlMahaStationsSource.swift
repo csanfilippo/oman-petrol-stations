@@ -40,16 +40,24 @@ final class AlMahaStationsSource: PetrolStationsSource {
         
         request.httpMethod = "POST"
         
-        let (data, _) = try await PetrolStationSourceError.uplift {
-            try await session.data(for: request)
+        guard let (data, response) = try? await session.data(for: request) else {
+            throw .invalidResponse
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw .invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw .serverError
         }
         
         guard let html = String(data: data, encoding: .utf8) else {
-            throw .uplifted(StationFetcherError.invalidResponse)
+            throw .invalidData
         }
         
         guard let document = try? HTML(html: html, encoding: .utf8) else {
-            throw .uplifted(StationFetcherError.invalidResponse)
+            throw .invalidData
         }
         
         var stations: [PetrolStation] = []

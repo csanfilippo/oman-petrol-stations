@@ -52,12 +52,20 @@ final class OmanOilStationsSource: PetrolStationsSource {
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
         
-        let (data, _) = try await PetrolStationSourceError.uplift {
-            try await self.session.data(from: self.source)
+        guard let (data, response) = try? await self.session.data(from: self.source) else {
+            throw .invalidResponse
         }
         
-        let stations: [OmanOilPetrolStation] = try PetrolStationSourceError.uplift {
-            try JSONDecoder().decode([OmanOilPetrolStation].self, from: data)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw .invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw .serverError
+        }
+        
+        guard let stations: [OmanOilPetrolStation] = try? JSONDecoder().decode([OmanOilPetrolStation].self, from: data) else {
+            throw .invalidData
         }
         
         return stations.compactMap { station -> PetrolStation? in
