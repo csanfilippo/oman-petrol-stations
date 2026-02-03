@@ -29,7 +29,6 @@ enum PetrolStationSourceError: Error {
     case invalidData
     case invalidResponse
     case serverError
-    case uplifted(any Error)
 }
 
 extension PetrolStationSourceError: Equatable {
