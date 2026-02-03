@@ -31,9 +31,9 @@ import Foundation
 @Suite("ShellStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct ShellStationsSourceTests {
     
-    @Test("should return the correct stations", .replay("fetchShellStations"))
+    @Test("should return the correct stations", .replay("fetchShellStations", matching: [.path], filters: [], scope: .test))
     func happyPath() async throws {
-        let source = ShellStationsSource(session: .shared)
+        let source = ShellStationsSource(session: Replay.session)
         
         let stations = try await source.getAllPetrolStations()
         
@@ -48,6 +48,53 @@ struct ShellStationsSourceTests {
         #expect(setOfNames.contains("SAIH AL RAWL SS"))
         #expect(setOfNames.contains("ZAMAIM SS"))
         
+    }
+    
+    @Test(
+        "should throw an exception in case of invalid data",
+            .replay(
+                stubs: [
+                    .get(
+                        "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                        200,
+                        ["Content-Type": "application/json"],
+                        { "" }
+                    )
+                ],
+                matching: [.path],
+                filters: [],
+                scope: .test
+            )
+    )
+    
+    func invalidData() async throws {
+        let source = ShellStationsSource(session: Replay.session)
+        
+        await #expect(throws: PetrolStationSourceError.invalidData) {
+            try await source.getAllPetrolStations()
+        }
+    }
+    
+    @Test("should throw an exception in case of no data",
+          .replay(
+            stubs: [
+                .get(
+                    "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                    200,
+                    ["Content-Type": "application/json"],
+                    { "{\"locations\":[]}" }
+                )
+            ],
+            matching: [.path],
+            filters: [],
+            scope: .test
+          ))
+    func emptyArray() async throws {
+        let source = ShellStationsSource(session: Replay.session)
+        
+        await #expect(throws: PetrolStationSourceError.noData) {
+            try await source.getAllPetrolStations()
+        }
     }
 }
 

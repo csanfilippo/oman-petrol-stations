@@ -27,7 +27,26 @@ import Foundation
 
 enum PetrolStationSourceError: Error, UpliftingErrors {
     case noData
+    case invalidData
+    case invalidResponse
+    case serverError
     case uplifted(any Error)
+}
+
+extension PetrolStationSourceError: Equatable {
+    static func == (lhs: PetrolStationSourceError, rhs: PetrolStationSourceError) -> Bool {
+        return switch (lhs, rhs) {
+        case (.noData, .noData),
+            (.invalidData, .invalidData),
+            (.invalidResponse, .invalidResponse),
+            (.serverError, .serverError):
+            true
+        case (.uplifted(let lhsError), .uplifted(let rhsError)):
+            "\(lhsError)" == "\(rhsError)"
+        default:
+            false
+        }
+    }
 }
 
 protocol PetrolStationsSource: Sendable {

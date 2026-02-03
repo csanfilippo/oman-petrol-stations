@@ -63,15 +63,19 @@ final class ShellStationsSource: PetrolStationsSource {
         }
         
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw .uplifted(StationFetcherError.invalidResponse)
+            throw .invalidResponse
         }
         
         guard httpResponse.statusCode == 200 else {
-            throw .uplifted(StationFetcherError.serverError)
+            throw .serverError
         }
         
-        let responseBody = try PetrolStationSourceError.uplift {
-            try JSONDecoder().decode(ShellResponse.self, from: data)
+        guard let responseBody = try? JSONDecoder().decode(ShellResponse.self, from: data) else {
+            throw .invalidData
+        }
+        
+        guard responseBody.locations.count > 0 else {
+            throw .noData
         }
         
         return responseBody
