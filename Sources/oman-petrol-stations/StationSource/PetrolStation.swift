@@ -47,8 +47,3 @@ extension PetrolStation: CustomStringConvertible {
                         """
     }
 }
-
-enum StationFetcherError: Swift.Error {
-    case invalidResponse
-    case serverError
-}
