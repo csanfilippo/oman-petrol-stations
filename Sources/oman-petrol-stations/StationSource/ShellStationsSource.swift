@@ -58,15 +58,15 @@ final class ShellStationsSource: PetrolStationsSource {
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
-        let (data, response) = try await PetrolStationSourceError.uplift {
-            try await session.data(from: url)
+        guard let (data, response) = try? await session.data(from: url) else {
+            throw .invalidResponse
         }
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw .invalidResponse
         }
-        
-        guard httpResponse.statusCode == 200 else {
+
+        guard (200...299).contains(httpResponse.statusCode) else {
             throw .serverError
         }
         

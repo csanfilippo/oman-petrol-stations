@@ -72,7 +72,7 @@ struct OmanOilStationsSourceTests {
         
         let first = try #require(stations.first { $0.id == "1" })
         #expect(first.name == "Station 1")
-        #expect(first.brand == "Omain Oil") // Matching the typo in source for now
+        #expect(first.brand == "Omain Oil")
         #expect(first.location.latitude == 23.61388)
         #expect(first.location.longitude == 58.5922)
     }

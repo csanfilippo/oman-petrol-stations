@@ -1,15 +1,6 @@
 {
-  "originHash" : "4e425918bee49dc8824c32713fc02dcb7f5e5c722f8ffdd7501636c66dbb9b3c",
+  "originHash" : "e90cf234618e549f87715fb62091daa955cfa764aa03bd0f773e2818d4ecd3ce",
   "pins" : [
-    {
-      "identity" : "altai",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/csanfilippo/altai",
-      "state" : {
-        "revision" : "fb91e76c36e4dcf93dfc9f8432bcf4af4141ab99",
-        "version" : "1.0.1"
-      }
-    },
     {
       "identity" : "csv.swift",
       "kind" : "remoteSourceControl",

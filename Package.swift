@@ -10,7 +10,6 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
         .package(url: "https://github.com/yaslab/CSV.swift", from: "2.5.2"),
         .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "6.0.1"),
-        .package(url: "https://github.com/csanfilippo/altai", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
         .package(url: "https://github.com/mattt/Replay.git", from: "0.3.0")
     ],
@@ -22,7 +21,6 @@ let package = Package(
                 .product(name: "CSV", package: "CSV.swift"),
                 .product(name: "Kanna", package: "Kanna"),
                 .product(name: "Logging", package: "swift-log"),
-                .product(name: "altai", package: "altai"),
                 .product(name: "OrderedCollections", package: "swift-collections")
             ]
         ),

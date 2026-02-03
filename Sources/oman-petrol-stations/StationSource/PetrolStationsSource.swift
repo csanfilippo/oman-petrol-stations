@@ -22,10 +22,9 @@
  SOFTWARE.
  */
 
-import altai
 import Foundation
 
-enum PetrolStationSourceError: Error, UpliftingErrors {
+enum PetrolStationSourceError: Error {
     case noData
     case invalidData
     case invalidResponse
@@ -41,8 +40,6 @@ extension PetrolStationSourceError: Equatable {
             (.invalidResponse, .invalidResponse),
             (.serverError, .serverError):
             true
-        case (.uplifted(let lhsError), .uplifted(let rhsError)):
-            "\(lhsError)" == "\(rhsError)"
         default:
             false
         }
