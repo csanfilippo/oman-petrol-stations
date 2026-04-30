@@ -23,6 +23,7 @@
  */
 
 import Foundation
+import Logging
 
 private struct OmanOilPetrolStation: Decodable {
     
@@ -50,25 +51,24 @@ final class OmanOilStationsSource: PetrolStationsSource {
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
-        
+        logger.debug("fetching Oman Oil stations")
+
         let request = URLRequest(url: source)
         let data = try await performRequest(request, session: session)
-        
-        guard let stations: [OmanOilPetrolStation] = try? JSONDecoder().decode([OmanOilPetrolStation].self, from: data) else {
+
+        guard let raw: [OmanOilPetrolStation] = try? JSONDecoder().decode([OmanOilPetrolStation].self, from: data) else {
             throw .invalidData
         }
-        
-        return stations.compactMap { station -> PetrolStation? in
+
+        let stations = raw.compactMap { station -> PetrolStation? in
             guard let latitude = Double(station.latitude), let longitude = Double(station.longitude) else {
                 return nil
             }
-            
-            return .init(
-                brand: .oomco,
-                name: station.name,
-                location: .init(latitude: latitude, longitude: longitude)
-            )
+            return PetrolStation(brand: .oomco, name: station.name, location: .init(latitude: latitude, longitude: longitude))
         }
+
+        logger.info("fetched \(stations.count) Oman Oil stations")
+        return stations
     }
     
     

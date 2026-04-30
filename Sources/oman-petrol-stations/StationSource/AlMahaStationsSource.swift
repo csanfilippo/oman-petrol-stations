@@ -24,6 +24,7 @@
 
 import Kanna
 import Foundation
+import Logging
 
 final class AlMahaStationsSource: PetrolStationsSource {
     
@@ -36,6 +37,8 @@ final class AlMahaStationsSource: PetrolStationsSource {
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
+        logger.debug("fetching Al Maha stations")
+
         var request = URLRequest(url: self.url)
         
         request.httpMethod = "POST"
@@ -81,6 +84,7 @@ final class AlMahaStationsSource: PetrolStationsSource {
             throw .noData
         }
 
+        logger.info("fetched \(stations.count) Al Maha stations")
         return stations
     }
     

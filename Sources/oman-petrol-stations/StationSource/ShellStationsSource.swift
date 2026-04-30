@@ -23,6 +23,7 @@
  */
 
 import Foundation
+import Logging
 
 private struct ShellStation: Decodable {
     
@@ -58,29 +59,30 @@ final class ShellStationsSource: PetrolStationsSource {
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
+        logger.debug("fetching Shell stations")
+
         let request = URLRequest(url: url)
         let data = try await performRequest(request, session: session)
-        
+
         guard let responseBody = try? JSONDecoder().decode(ShellResponse.self, from: data) else {
             throw .invalidData
         }
-        
+
         guard responseBody.locations.count > 0 else {
             throw .noData
         }
-        
-        return responseBody
-            .locations
+
+        let stations = responseBody.locations
             .filter { $0.isActive }
             .map {
-                .init(
+                PetrolStation(
                     brand: .shell,
                     name: $0.name,
-                    location: .init(
-                        latitude: $0.latitude,
-                        longitude: $0.longitude
-                    )
+                    location: .init(latitude: $0.latitude, longitude: $0.longitude)
                 )
             }
+
+        logger.info("fetched \(stations.count) Shell stations")
+        return stations
     }
 }
