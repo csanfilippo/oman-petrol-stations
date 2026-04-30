@@ -88,19 +88,26 @@ struct oman_petrol_stations: AsyncParsableCommand {
     var petrolCompanyList: PetrolCompanyList = [.shell, .oomco, .almaha]
     
     mutating func run() async throws {
-        
-        let session = URLSession.shared
-        
-        let stations = try await fetchAllFrom {
-            for company in petrolCompanyList.companies.sorted(by: { $0.rawValue < $1.rawValue }) {
-                company.makeSource(session: session)
-            }
-        }
-        
-        let serializer = serializerFor(format)
-        
-        try serializer.save(stations: stations, into: File(absolutePath: outputFilePath))
+        try await exportStations(
+            companies: petrolCompanyList.companies,
+            format: format,
+            outputPath: outputFilePath
+        )
     }
+}
+
+private func exportStations(
+    companies: Set<PetrolCompany>,
+    format: SerializationFormat,
+    outputPath: String,
+    session: URLSession = .shared
+) async throws {
+    let stations = try await fetchAllFrom {
+        for company in companies.sorted(by: { $0.rawValue < $1.rawValue }) {
+            company.makeSource(session: session)
+        }
+    }
+    try serializerFor(format).save(stations: stations, into: File(absolutePath: outputPath))
 }
 
 private extension PetrolCompany {
