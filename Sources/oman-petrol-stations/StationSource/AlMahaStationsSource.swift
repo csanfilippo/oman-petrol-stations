@@ -77,6 +77,10 @@ final class AlMahaStationsSource: PetrolStationsSource {
             )
         }
         
+        guard !stations.isEmpty else {
+            throw .noData
+        }
+
         return stations
     }
     

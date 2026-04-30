@@ -76,8 +76,31 @@ struct AlMahaStationsSourceTests {
      )
     func serverError() async throws {
         let source = AlMahaStationsSource(session: Replay.session)
-        
+
         await #expect(throws: PetrolStationSourceError.serverError) {
+            try await source.getAllPetrolStations()
+        }
+    }
+
+    @Test(
+        "should throw noData when HTML contains no stations",
+        .replay(
+            stubs: [
+                .post(
+                    "https://www.almaha.com.om/en/map/",
+                    200,
+                    ["Content-Type": "text/html"],
+                    { "<html><body></body></html>" }
+                )
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func emptyStations() async throws {
+        let source = AlMahaStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.noData) {
             try await source.getAllPetrolStations()
         }
     }
