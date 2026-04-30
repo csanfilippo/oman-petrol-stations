@@ -40,7 +40,7 @@ private struct OmanOilPetrolStation: Decodable {
     let longitude: String
 }
 
-final class OmanOilStationsSource: PetrolStationsSource {
+struct OmanOilStationsSource: PetrolStationsSource {
     
     private let session: URLSession
     private let source: URL

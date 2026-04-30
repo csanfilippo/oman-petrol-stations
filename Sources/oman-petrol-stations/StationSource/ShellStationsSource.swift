@@ -48,7 +48,7 @@ private struct ShellResponse: Decodable {
     let locations: [ShellStation]
 }
 
-final class ShellStationsSource: PetrolStationsSource {
+struct ShellStationsSource: PetrolStationsSource {
     
     private let session: URLSession
     private let url: URL

@@ -26,7 +26,7 @@ import Kanna
 import Foundation
 import Logging
 
-final class AlMahaStationsSource: PetrolStationsSource {
+struct AlMahaStationsSource: PetrolStationsSource {
     
     private let session: URLSession
     private let url: URL

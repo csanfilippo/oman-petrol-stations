@@ -119,6 +119,5 @@ final class CSVPetrolStationSerializer: PetrolStationSerializer {
         try storage.save(text)
     }
     
-    @inline(__always)
     private func format(_ value: Double) -> String { String(format: "%.6f", value) }
 }
