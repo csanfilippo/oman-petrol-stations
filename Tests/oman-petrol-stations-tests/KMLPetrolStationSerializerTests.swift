@@ -105,12 +105,6 @@ struct KMLPetrolStationSerializerTests {
 
         #expect(storage.storage.contains("<name>A&amp;B &lt;C&gt; &quot;D&quot; &apos;E&apos;</name>"))
 
-        #expect(storage.storage.contains("<description>"))
-        #expect(storage.storage.contains("Brand: "))
-        #expect(storage.storage.contains("&amp;amp;"))   // double-escaped &
-        #expect(storage.storage.contains("&amp;lt;"))    // double-escaped <
-        #expect(storage.storage.contains("&amp;gt;"))    // double-escaped >
-        #expect(storage.storage.contains("&amp;quot;"))  // double-escaped "
-        #expect(storage.storage.contains("&amp;apos;"))  // double-escaped '
+        #expect(storage.storage.contains("<description>Brand: X&amp;Y &lt;Z&gt; &quot;Q&quot; &apos;W&apos;</description>"))
     }
 }

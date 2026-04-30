@@ -66,14 +66,13 @@ final class KMLPetrolStationSerializer: PetrolStationSerializer {
 
         let placemarks = stations.map { station -> String in
             let name = escape(station.name.capitalized(with: .current))
-            let brand = escape(station.brand)
-            let description = "Brand: \(brand)"
+            let description = escape("Brand: \(station.brand)")
             let lon = station.location.longitude
             let lat = station.location.latitude
             return """
                 <Placemark>
                     <name>\(name)</name>
-                    <description>\(escape(description))</description>
+                    <description>\(description)</description>
                     <Point>
                         <coordinates>\(lon),\(lat)</coordinates>
                     </Point>
