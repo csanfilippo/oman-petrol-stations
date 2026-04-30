@@ -24,25 +24,11 @@
 
 import Foundation
 
-enum PetrolStationSourceError: Error {
+enum PetrolStationSourceError: Error, Equatable {
     case noData
     case invalidData
     case invalidResponse
     case serverError
-}
-
-extension PetrolStationSourceError: Equatable {
-    static func == (lhs: PetrolStationSourceError, rhs: PetrolStationSourceError) -> Bool {
-        return switch (lhs, rhs) {
-        case (.noData, .noData),
-            (.invalidData, .invalidData),
-            (.invalidResponse, .invalidResponse),
-            (.serverError, .serverError):
-            true
-        default:
-            false
-        }
-    }
 }
 
 protocol PetrolStationsSource: Sendable {
