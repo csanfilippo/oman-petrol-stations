@@ -26,7 +26,7 @@ import Logging
 import Foundation
 import ArgumentParser
 
-enum OutputFormat: ExpressibleByArgument, CaseIterable {
+extension SerializationFormat: ExpressibleByArgument {
     init?(argument: String) {
         switch argument.lowercased() {
         case "kml": self = .kml
@@ -34,9 +34,6 @@ enum OutputFormat: ExpressibleByArgument, CaseIterable {
         default: return nil
         }
     }
-    
-    case csv
-    case kml
 }
 
 extension PetrolCompany: ExpressibleByArgument {
@@ -85,7 +82,7 @@ struct oman_petrol_stations: AsyncParsableCommand {
     var outputFilePath: String
     
     @Option(help: "The format of output file")
-    var format: OutputFormat = .kml
+    var format: SerializationFormat = .kml
     
     @Option(help: "Comma-separated list of petrol companies")
     var petrolCompanyList: PetrolCompanyList = [.shell, .oomco, .almaha]
@@ -108,17 +105,9 @@ struct oman_petrol_stations: AsyncParsableCommand {
             }
         }
         
-        let serializer = serializerFor(format.asSerializationFormat)
+        let serializer = serializerFor(format)
         
         try serializer.save(stations: stations, into: File(absolutePath: outputFilePath))
     }
 }
 
-private extension OutputFormat {
-    var asSerializationFormat: SerializationFormat {
-        switch self {
-        case .csv: return .csv
-        case .kml: return .kml
-        }
-    }
-}
