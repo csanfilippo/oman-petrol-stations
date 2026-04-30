@@ -27,73 +27,87 @@ import Foundation
 
 @testable import oman_petrol_stations
 
-private final class DummySource: PetrolStationsSource {
-    
-    private let injectedStations: [PetrolStation]
-    
-    init(injectedStations: [PetrolStation]) {
-        self.injectedStations = injectedStations
-    }
-    
+private struct DummySource: PetrolStationsSource {
+    let injectedStations: [PetrolStation]
+
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
         injectedStations
     }
 }
 
-@Suite("FetchAllTests")
+private struct ThrowingSource: PetrolStationsSource {
+    let error: PetrolStationSourceError
+
+    func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
+        throw error
+    }
+}
+
+@Suite("FetchAll")
 struct FetchAllTests {
-    @Test("the resulting array after a fetch should contain all the stations from the provided sources")
-    func fetchAll() async throws {
-        let source1 = DummySource(injectedStations: [.init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
-        let source2 = DummySource(injectedStations: [.init(brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
-        
-        let expectedStations: [PetrolStation] = [
+
+    @Test("collects stations from all provided sources")
+    func collectsStationsFromAllSources() async throws {
+        let source1 = DummySource(injectedStations: [
+            .init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))
+        ])
+        let source2 = DummySource(injectedStations: [
+            .init(brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))
+        ])
+
+        let stations = try await fetchAllFrom {
+            source1
+            source2
+        }
+
+        #expect(stations == [
             .init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
             .init(brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))
-        ]
-        
-        let stations = try await fetchAllFrom {
-            source1
-            source2
-        }
-        
-        #expect(stations == expectedStations)
-        
+        ])
     }
-    
-    @Test("the resulting array after a fetch from empty sources should be empty")
-    func fetchEmpty() async throws {
-        let source1 = DummySource(injectedStations: [])
-        let source2 = DummySource(injectedStations: [])
-        
-        let expectedStations: [PetrolStation] = []
-        
+
+    @Test("returns empty array when all sources are empty")
+    func returnsEmptyWhenAllSourcesEmpty() async throws {
         let stations = try await fetchAllFrom {
-            source1
-            source2
+            DummySource(injectedStations: [])
+            DummySource(injectedStations: [])
         }
-        
-        #expect(stations == expectedStations)
-        
+        #expect(stations.isEmpty)
     }
-    
+
+    @Test("error thrown by any source propagates out")
+    func errorFromSourcePropagates() async throws {
+        let good = DummySource(injectedStations: [
+            .init(brand: .shell, name: "S", location: .init(latitude: 1, longitude: 1))
+        ])
+        let failing = ThrowingSource(error: .serverError)
+
+        await #expect(throws: PetrolStationSourceError.serverError) {
+            try await fetchAllFrom {
+                good
+                failing
+            }
+        }
+    }
+
     @Test(
-        "the resulting array after a fetch should contain only the stations from the sources that are conditionally passed as arguments",
+        "only sources that pass the condition are fetched",
         arguments: [
-            (true, [
-                PetrolStation(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))
-                    ]
-            ),
+            (true,  [PetrolStation(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))]),
             (false, [
                 PetrolStation(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
-                PetrolStation(brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))
-                    ]
-            ),
-            ]
+                PetrolStation(brand: .oomco, name: "OmanStation",  location: .init(latitude: 22, longitude: 22))
+            ])
+        ]
     )
-    func fetchConditionally(_ include: Bool, _ expected: [PetrolStation]) async throws {
-        let source1 = DummySource(injectedStations: [.init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
-        let source2 = DummySource(injectedStations: [.init(brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
+    func onlyConditionallIncludedSourcesAreFetched(_ include: Bool, _ expected: [PetrolStation]) async throws {
+        let source1 = DummySource(injectedStations: [
+            .init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))
+        ])
+        let source2 = DummySource(injectedStations: [
+            .init(brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))
+        ])
+
         let stations = try await fetchAllFrom {
             if include {
                 source1
@@ -102,28 +116,26 @@ struct FetchAllTests {
                 source2
             }
         }
-        
+
         #expect(stations == expected)
-        
     }
-    
+
     @Test(
-        "the resulting array after a fetch should contain only the stations from the sources that are conditionally passed as arguments",
+        "source guarded by if is excluded when condition is false",
         arguments: [
-            (true, [PetrolStation(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))]),
-            (false, [])
+            (true,  [PetrolStation(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))]),
+            (false, [PetrolStation]())
         ]
     )
-    func fetchWithSimpleIf(_ include: Bool, _ expected: [PetrolStation]) async throws {
-        let source = DummySource(injectedStations: [.init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
-        
+    func sourceGuardedByIfIsExcludedWhenConditionFalse(_ include: Bool, _ expected: [PetrolStation]) async throws {
+        let source = DummySource(injectedStations: [
+            .init(brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))
+        ])
+
         let stations = try await fetchAllFrom {
-            if include {
-                source
-            }
+            if include { source }
         }
-        
+
         #expect(stations == expected)
-        
     }
 }

@@ -28,55 +28,75 @@ import Foundation
 @testable import oman_petrol_stations
 
 final class InspectableStorage: Storage {
-    
     private(set) var storage: String = ""
-    
+
     func save(_ string: String) throws {
         storage = string
     }
 }
 
-@Suite("CSVPetrolStationSerializerTests")
+@Suite("CSVPetrolStationSerializer")
 struct CSVPetrolStationSerializerTests {
-    
-    @Test("saving an empty array will result in a csv file with just the header")
-    func emptyArray() throws {
-        let emptyArray: [PetrolStation] = []
+
+    @Test("empty station list produces header row only")
+    func emptyStationListProducesHeaderOnly() throws {
         let serializer = CSVPetrolStationSerializer()
-        let inspectableStorage = InspectableStorage()
-        try serializer.save(stations: emptyArray, into: inspectableStorage)
-        let expected = "Name,Brand,Latitude,Longitude"
-        
-        #expect(inspectableStorage.storage == expected)
+        let storage = InspectableStorage()
+
+        try serializer.save(stations: [], into: storage)
+
+        #expect(storage.storage == "Name,Brand,Latitude,Longitude")
     }
-    
-    @Test("saving an not empty array will result in a csv file all the lines")
-    func notEmptyArray() throws {
-        let emptyArray: [PetrolStation] = [.init(brand: .shell, name: "Test", location: .init(latitude: 2.2, longitude: 3.2))]
+
+    @Test("single station is serialized as a CSV row with brand display name")
+    func singleStationSerializedAsCSVRow() throws {
+        let stations: [PetrolStation] = [
+            .init(brand: .shell, name: "Test", location: .init(latitude: 2.2, longitude: 3.2))
+        ]
         let serializer = CSVPetrolStationSerializer()
-        let inspectableStorage = InspectableStorage()
-        try serializer.save(stations: emptyArray, into: inspectableStorage)
+        let storage = InspectableStorage()
+
+        try serializer.save(stations: stations, into: storage)
+
         let expected = """
             Name,Brand,Latitude,Longitude
             Test,Shell,2.200000,3.200000
             """
-        
-        
-        #expect(inspectableStorage.storage == expected)
+        #expect(storage.storage == expected)
     }
-    
-    @Test("station names are capitalized")
-    func capitalizedStationName() throws {
-        let emptyArray: [PetrolStation] = [.init(brand: .shell, name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))]
+
+    @Test("multiple stations produce one row each with correct brand display names")
+    func multipleStationsProduceOneRowEach() throws {
+        let stations: [PetrolStation] = [
+            .init(brand: .shell, name: "Station A", location: .init(latitude: 23.0, longitude: 58.0)),
+            .init(brand: .oomco, name: "Station B", location: .init(latitude: 24.0, longitude: 59.0))
+        ]
         let serializer = CSVPetrolStationSerializer()
-        let inspectableStorage = InspectableStorage()
-        try serializer.save(stations: emptyArray, into: inspectableStorage)
+        let storage = InspectableStorage()
+
+        try serializer.save(stations: stations, into: storage)
+
+        let lines = storage.storage.components(separatedBy: "\n")
+        #expect(lines.count == 3)
+        #expect(lines[0] == "Name,Brand,Latitude,Longitude")
+        #expect(lines[1] == "Station A,Shell,23.000000,58.000000")
+        #expect(lines[2] == "Station B,Oman Oil,24.000000,59.000000")
+    }
+
+    @Test("capitalizes station names")
+    func capitalizesStationNames() throws {
+        let stations: [PetrolStation] = [
+            .init(brand: .shell, name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))
+        ]
+        let serializer = CSVPetrolStationSerializer()
+        let storage = InspectableStorage()
+
+        try serializer.save(stations: stations, into: storage)
+
         let expected = """
             Name,Brand,Latitude,Longitude
             Test,Shell,2.200000,3.200000
             """
-        
-        
-        #expect(inspectableStorage.storage == expected)
+        #expect(storage.storage == expected)
     }
 }

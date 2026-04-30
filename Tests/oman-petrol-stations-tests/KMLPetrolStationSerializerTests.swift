@@ -27,17 +27,15 @@ import Testing
 
 @testable import oman_petrol_stations
 
-
-@Suite("KMLPetrolStationSerializerTests")
+@Suite("KMLPetrolStationSerializer")
 struct KMLPetrolStationSerializerTests {
 
-    @Test("empty array produces only header and footer")
-    func testEmptyArrayProducesOnlyHeaderAndFooter() throws {
-        let stations: [PetrolStation] = []
+    @Test("empty station list produces valid KML document with no Placemarks")
+    func emptyStationListProducesKMLWithNoPlacemarks() throws {
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: [], into: storage)
 
         let expected = """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -50,46 +48,57 @@ struct KMLPetrolStationSerializerTests {
         #expect(storage.storage == expected)
     }
 
-    @Test("single station includes a Placemark with correct coordinates and escaped name")
-    func testSingleStationIncludesPlacemarkCorrectly() throws {
-        // Arrange
+    @Test("station is serialized as a Placemark with longitude,latitude coordinate order")
+    func stationSerializedAsPlacemarkWithCorrectCoordinateOrder() throws {
         let stations = [
             PetrolStation(brand: .shell, name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
 
-        // Act
         try serializer.save(stations: stations, into: storage)
 
-        // Assert
         #expect(storage.storage.contains("<Placemark>"))
         #expect(storage.storage.contains("<name>Test Station</name>"))
         #expect(storage.storage.contains("<coordinates>3.0,2.0</coordinates>"))
+        #expect(storage.storage.contains("<description>Brand: Shell</description>"))
         #expect(storage.storage.contains("</Placemark>"))
     }
 
-    @Test("station name are capitalized")
-    func testCapitalizeStationName() throws {
-        // Arrange
+    @Test("multiple stations produce one Placemark each")
+    func multipleStationsProduceOnePlacemarkEach() throws {
+        let stations: [PetrolStation] = [
+            .init(brand: .shell, name: "Station A", location: .init(latitude: 23.0, longitude: 58.0)),
+            .init(brand: .oomco, name: "Station B", location: .init(latitude: 24.0, longitude: 59.0))
+        ]
+        let serializer = KMLPetrolStationSerializer()
+        let storage = InspectableStorage()
+
+        try serializer.save(stations: stations, into: storage)
+
+        let placemarkCount = storage.storage.components(separatedBy: "<Placemark>").count - 1
+        #expect(placemarkCount == 2)
+        #expect(storage.storage.contains("<name>Station A</name>"))
+        #expect(storage.storage.contains("<description>Brand: Shell</description>"))
+        #expect(storage.storage.contains("<name>Station B</name>"))
+        #expect(storage.storage.contains("<description>Brand: Oman Oil</description>"))
+    }
+
+    @Test("capitalizes station names")
+    func capitalizesStationNames() throws {
         let stations = [
             PetrolStation(brand: .shell, name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
 
-        // Act
         try serializer.save(stations: stations, into: storage)
 
-        // Assert
-        #expect(storage.storage.contains("<Placemark>"))
         #expect(storage.storage.contains("<name>Test Station</name>"))
-        #expect(storage.storage.contains("<coordinates>3.0,2.0</coordinates>"))
-        #expect(storage.storage.contains("</Placemark>"))
     }
 
-    @Test("escaping of special characters in name")
-    func testEscapingSpecialCharactersInName() throws {
+    @Test("XML-escapes special characters in station name")
+    func xmlEscapesSpecialCharactersInName() throws {
         let stations = [
             PetrolStation(
                 brand: .shell,

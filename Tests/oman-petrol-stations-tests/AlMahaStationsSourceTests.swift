@@ -28,53 +28,41 @@ import Foundation
 
 @testable import oman_petrol_stations
 
-@Suite("AlMahaStationsSourceDetails", .playbackIsolated(replaysFrom: Bundle.module))
+@Suite("AlMahaStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct AlMahaStationsSourceTests {
-    
+
     @Test(
-        "should return the correct stations from HTML",
-        .replay(
-            "fetchAlMahaStations",
-            matching: [.path, .method],
-            filters: [],
-            scope: .test
-        )
+        "parses stations with correct brand and coordinates from HTML",
+        .replay("fetchAlMahaStations", matching: [.path, .method], filters: [], scope: .test)
     )
-    func happyPath() async throws {
+    func parsesStationsFromHTML() async throws {
         let source = AlMahaStationsSource(session: Replay.session)
-        
+
         let stations = try await source.getAllPetrolStations()
-        
+
         #expect(stations.count == 2)
-        
-        // Station 1
+        #expect(stations.allSatisfy { $0.brand == .almaha })
+
         let s1 = try #require(stations.first { $0.name == "Station 1" })
-        #expect(s1.brand == .almaha)
         #expect(s1.location.latitude == 23.588)
         #expect(s1.location.longitude == 58.382)
-        
-        // Station 2
+
         let s2 = try #require(stations.first { $0.name == "Station 2" })
         #expect(s2.location.latitude == 24.0)
         #expect(s2.location.longitude == 57.0)
     }
-    
+
     @Test(
-         "should throw error on server failure",
-         .replay(
-             stubs: [
-                 .post(
-                     "https://www.almaha.com.om/en/map/",
-                     500,
-                     [:],
-                     { "" }
-                 )
-             ],
-             matching: [.path],
-             scope: .test
-         )
-     )
-    func serverError() async throws {
+        "throws serverError on 5xx response",
+        .replay(
+            stubs: [
+                .post("https://www.almaha.com.om/en/map/", 500, [:], { "" })
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func throwsServerErrorOn5xxResponse() async throws {
         let source = AlMahaStationsSource(session: Replay.session)
 
         await #expect(throws: PetrolStationSourceError.serverError) {
@@ -83,7 +71,7 @@ struct AlMahaStationsSourceTests {
     }
 
     @Test(
-        "should throw noData when HTML contains no stations",
+        "throws noData when HTML contains no station elements",
         .replay(
             stubs: [
                 .post(
@@ -97,7 +85,7 @@ struct AlMahaStationsSourceTests {
             scope: .test
         )
     )
-    func emptyStations() async throws {
+    func throwsNoDataWhenNoStationElementsFound() async throws {
         let source = AlMahaStationsSource(session: Replay.session)
 
         await #expect(throws: PetrolStationSourceError.noData) {

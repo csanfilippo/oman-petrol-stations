@@ -28,11 +28,11 @@ import Foundation
 
 @testable import oman_petrol_stations
 
-@Suite("OmanOilStationsSourceDetails", .playbackIsolated(replaysFrom: Bundle.module))
+@Suite("OmanOilStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct OmanOilStationsSourceTests {
 
     @Test(
-        "should return the correct stations",
+        "parses stations with correct brand and coordinates",
         .replay(
             stubs: [
                 .get(
@@ -42,18 +42,8 @@ struct OmanOilStationsSourceTests {
                     {
                         """
                         [
-                          {
-                            "id": 1,
-                            "name": "Station 1",
-                            "locX": "23.61388",
-                            "locY": "58.5922"
-                          },
-                          {
-                            "id": 2,
-                            "name": "Station 2",
-                            "locX": "23.58800",
-                            "locY": "58.38200"
-                          }
+                          {"id":1,"name":"Station 1","locX":"23.61388","locY":"58.5922"},
+                          {"id":2,"name":"Station 2","locX":"23.58800","locY":"58.38200"}
                         ]
                         """
                     }
@@ -63,38 +53,91 @@ struct OmanOilStationsSourceTests {
             scope: .test
         )
     )
-    func happyPath() async throws {
+    func parsesStationsWithCorrectBrandAndCoordinates() async throws {
         let source = OmanOilStationsSource(session: Replay.session)
 
         let stations = try await source.getAllPetrolStations()
 
         #expect(stations.count == 2)
-        
+        #expect(stations.allSatisfy { $0.brand == .oomco })
+
         let first = try #require(stations.first { $0.name == "Station 1" })
-        #expect(first.brand == .oomco)
         #expect(first.location.latitude == 23.61388)
         #expect(first.location.longitude == 58.5922)
+
+        let second = try #require(stations.first { $0.name == "Station 2" })
+        #expect(second.location.latitude == 23.588)
+        #expect(second.location.longitude == 58.382)
     }
 
     @Test(
-        "should throw an exception in case of invalid data",
+        "silently skips stations with unparseable coordinates",
         .replay(
             stubs: [
                 .get(
                     "https://www.oomco.com/station-search",
                     200,
                     ["Content-Type": "application/json"],
-                    { "{ \"invalid\": \"json\" }" }
+                    {
+                        """
+                        [
+                          {"id":1,"name":"Valid","locX":"23.0","locY":"58.0"},
+                          {"id":2,"name":"Bad coords","locX":"N/A","locY":"N/A"}
+                        ]
+                        """
+                    }
                 )
             ],
             matching: [.path],
             scope: .test
         )
     )
-    func invalidData() async throws {
+    func silentlySkipsStationsWithUnparseableCoordinates() async throws {
         let source = OmanOilStationsSource(session: Replay.session)
 
-        await #expect(throws: PetrolStationSourceError.self) {
+        let stations = try await source.getAllPetrolStations()
+
+        #expect(stations.count == 1)
+        #expect(stations[0].name == "Valid")
+    }
+
+    @Test(
+        "throws invalidData when response is not a station array",
+        .replay(
+            stubs: [
+                .get(
+                    "https://www.oomco.com/station-search",
+                    200,
+                    ["Content-Type": "application/json"],
+                    { "{ \"error\": \"not found\" }" }
+                )
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func throwsInvalidDataOnUnexpectedShape() async throws {
+        let source = OmanOilStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.invalidData) {
+            try await source.getAllPetrolStations()
+        }
+    }
+
+    @Test(
+        "throws serverError on 5xx response",
+        .replay(
+            stubs: [
+                .get("https://www.oomco.com/station-search", 500, [:], { "" })
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func throwsServerErrorOn5xxResponse() async throws {
+        let source = OmanOilStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.serverError) {
             try await source.getAllPetrolStations()
         }
     }

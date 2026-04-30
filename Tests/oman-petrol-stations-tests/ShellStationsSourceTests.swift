@@ -30,55 +30,75 @@ import Foundation
 
 @Suite("ShellStationsSource", .playbackIsolated(replaysFrom: Bundle.module))
 struct ShellStationsSourceTests {
-    
+
     @Test(
-        "should return the correct stations",
-            .replay(
-                "fetchShellStations",
-                matching: [.path],
-                filters: [],
-                scope: .test)
+        "parses active stations from response",
+        .replay("fetchShellStations", matching: [.path], filters: [], scope: .test)
     )
-    func happyPath() async throws {
+    func parsesActiveStationsFromResponse() async throws {
         let source = ShellStationsSource(session: Replay.session)
-        
+
         let stations = try await source.getAllPetrolStations()
-        
-        let names = stations.uniqueValues(of: \.name)
 
         #expect(stations.count == 2)
-        #expect(names.contains("SAIH AL RAWL SS"))
-        #expect(names.contains("ZAMAIM SS"))
-        
+        #expect(stations.allSatisfy { $0.brand == .shell })
+        #expect(stations.map(\.name).contains("SAIH AL RAWL SS"))
+        #expect(stations.map(\.name).contains("ZAMAIM SS"))
     }
-    
+
     @Test(
-        "should throw an exception in case of invalid data",
-            .replay(
-                stubs: [
-                    .get(
-                        "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
-                        200,
-                        ["Content-Type": "application/json"],
-                        { "" }
-                    )
-                ],
-                matching: [.path],
-                filters: [],
-                scope: .test
-            )
+        "excludes inactive stations from results",
+        .replay(
+            stubs: [
+                .get(
+                    "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                    200,
+                    ["Content-Type": "application/json"],
+                    { """
+                    {"locations":[
+                      {"id":"1","name":"Active","lat":23.0,"lng":58.0,"inactive":false},
+                      {"id":"2","name":"Inactive","lat":24.0,"lng":59.0,"inactive":true}
+                    ]}
+                    """ }
+                )
+            ],
+            matching: [.path], filters: [], scope: .test
+        )
     )
-    
-    func invalidData() async throws {
+    func excludesInactiveStations() async throws {
         let source = ShellStationsSource(session: Replay.session)
-        
+
+        let stations = try await source.getAllPetrolStations()
+
+        #expect(stations.count == 1)
+        #expect(stations[0].name == "Active")
+    }
+
+    @Test(
+        "throws invalidData on malformed response body",
+        .replay(
+            stubs: [
+                .get(
+                    "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                    200,
+                    ["Content-Type": "application/json"],
+                    { "" }
+                )
+            ],
+            matching: [.path], filters: [], scope: .test
+        )
+    )
+    func throwsInvalidDataOnMalformedResponse() async throws {
+        let source = ShellStationsSource(session: Replay.session)
+
         await #expect(throws: PetrolStationSourceError.invalidData) {
             try await source.getAllPetrolStations()
         }
     }
-    
-    @Test("should throw an exception in case of no data",
-          .replay(
+
+    @Test(
+        "throws noData when locations array is empty",
+        .replay(
             stubs: [
                 .get(
                     "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
@@ -87,21 +107,36 @@ struct ShellStationsSourceTests {
                     { "{\"locations\":[]}" }
                 )
             ],
-            matching: [.path],
-            filters: [],
-            scope: .test
-          ))
-    func emptyArray() async throws {
+            matching: [.path], filters: [], scope: .test
+        )
+    )
+    func throwsNoDataWhenLocationsEmpty() async throws {
         let source = ShellStationsSource(session: Replay.session)
-        
+
         await #expect(throws: PetrolStationSourceError.noData) {
             try await source.getAllPetrolStations()
         }
     }
-}
 
-private extension Array where Element == PetrolStation {
-    func uniqueValues<T>(of keyPath: KeyPath<Element, T>) -> Set<T> {
-        Set(map { $0[keyPath: keyPath] })
+    @Test(
+        "throws serverError on 5xx response",
+        .replay(
+            stubs: [
+                .get(
+                    "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                    500,
+                    [:],
+                    { "" }
+                )
+            ],
+            matching: [.path], filters: [], scope: .test
+        )
+    )
+    func throwsServerErrorOn5xxResponse() async throws {
+        let source = ShellStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.serverError) {
+            try await source.getAllPetrolStations()
+        }
     }
 }
