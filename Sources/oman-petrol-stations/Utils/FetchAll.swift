@@ -46,6 +46,10 @@ struct FetchAllStationsBuilder {
     static func buildEither(second component: [PetrolStationsSource]) -> [PetrolStationsSource] {
         component
     }
+
+    static func buildArray(_ components: [[PetrolStationsSource]]) -> [PetrolStationsSource] {
+        components.flatMap { $0 }
+    }
 }
 
 func fetchAllFrom(@FetchAllStationsBuilder _ sources: () -> [PetrolStationsSource]) async throws -> [PetrolStation] {

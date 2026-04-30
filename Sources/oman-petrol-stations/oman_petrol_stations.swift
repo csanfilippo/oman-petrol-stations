@@ -92,16 +92,8 @@ struct oman_petrol_stations: AsyncParsableCommand {
         let session = URLSession.shared
         
         let stations = try await fetchAllFrom {
-            if petrolCompanyList.companies.contains(.almaha) {
-                AlMahaStationsSource(session: session)
-            }
-            
-            if petrolCompanyList.companies.contains(.oomco) {
-                OmanOilStationsSource(session: session)
-            }
-            
-            if petrolCompanyList.companies.contains(.shell) {
-                ShellStationsSource(session: session)
+            for company in petrolCompanyList.companies.sorted(by: { $0.rawValue < $1.rawValue }) {
+                company.makeSource(session: session)
             }
         }
         
@@ -111,3 +103,12 @@ struct oman_petrol_stations: AsyncParsableCommand {
     }
 }
 
+private extension PetrolCompany {
+    func makeSource(session: URLSession) -> any PetrolStationsSource {
+        switch self {
+        case .almaha: AlMahaStationsSource(session: session)
+        case .oomco:  OmanOilStationsSource(session: session)
+        case .shell:  ShellStationsSource(session: session)
+        }
+    }
+}
