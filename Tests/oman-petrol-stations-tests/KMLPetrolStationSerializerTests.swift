@@ -54,7 +54,7 @@ struct KMLPetrolStationSerializerTests {
     func testSingleStationIncludesPlacemarkCorrectly() throws {
         // Arrange
         let stations = [
-            PetrolStation(id: "1", brand: "Shell", name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
+            PetrolStation(id: "1", brand: .shell, name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
@@ -73,7 +73,7 @@ struct KMLPetrolStationSerializerTests {
     func testCapitalizeStationName() throws {
         // Arrange
         let stations = [
-            PetrolStation(id: "1", brand: "Shell", name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
+            PetrolStation(id: "1", brand: .shell, name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
@@ -88,12 +88,12 @@ struct KMLPetrolStationSerializerTests {
         #expect(storage.storage.contains("</Placemark>"))
     }
 
-    @Test("escaping of special characters in name and brand")
-    func testEscapingSpecialCharactersInNameAndBrand() throws {
+    @Test("escaping of special characters in name")
+    func testEscapingSpecialCharactersInName() throws {
         let stations = [
             PetrolStation(
                 id: "1",
-                brand: "X&Y <Z> \"Q\" 'W'",
+                brand: .shell,
                 name: "A&B <C> \"D\" 'E'",
                 location: .init(latitude: 1.0, longitude: 1.0)
             )
@@ -104,7 +104,6 @@ struct KMLPetrolStationSerializerTests {
         try serializer.save(stations: stations, into: storage)
 
         #expect(storage.storage.contains("<name>A&amp;B &lt;C&gt; &quot;D&quot; &apos;E&apos;</name>"))
-
-        #expect(storage.storage.contains("<description>Brand: X&amp;Y &lt;Z&gt; &quot;Q&quot; &apos;W&apos;</description>"))
+        #expect(storage.storage.contains("<description>Brand: Shell</description>"))
     }
 }

@@ -49,7 +49,7 @@ struct AlMahaStationsSourceTests {
         
         // Station 1
         let s1 = try #require(stations.first { $0.name == "Station 1" })
-        #expect(s1.brand == "Al Maha")
+        #expect(s1.brand == .almaha)
         #expect(s1.location.latitude == 23.588)
         #expect(s1.location.longitude == 58.382)
         

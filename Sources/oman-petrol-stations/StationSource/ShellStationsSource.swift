@@ -75,7 +75,7 @@ final class ShellStationsSource: PetrolStationsSource {
             .map {
                 .init(
                     id: $0.id,
-                    brand: "Shell",
+                    brand: .shell,
                     name: $0.name,
                     location: .init(
                         latitude: $0.latitude,

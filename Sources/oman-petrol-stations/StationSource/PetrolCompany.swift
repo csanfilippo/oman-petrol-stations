@@ -22,28 +22,16 @@
  SOFTWARE.
  */
 
-import Foundation
+enum PetrolCompany: String, CaseIterable, Hashable, Sendable {
+    case oomco
+    case shell
+    case almaha
 
-struct PetrolStation: Sendable, Hashable {
-    
-    struct Location: Sendable, Hashable {
-        let latitude: Double
-        let longitude: Double
-    }
-    
-    let id: String
-    let brand: PetrolCompany
-    let name: String
-    let location: Location
-}
-
-
-extension PetrolStation: CustomStringConvertible {
-    var description: String {
-                        """
-                        Name: \(name)
-                        Brand: \(brand.displayName)
-                        Position: \(location.latitude)-\(location.longitude)\n
-                        """
+    var displayName: String {
+        switch self {
+        case .oomco:   "Oman Oil"
+        case .shell:   "Shell"
+        case .almaha:  "Al Maha"
+        }
     }
 }

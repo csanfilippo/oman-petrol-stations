@@ -44,12 +44,12 @@ private final class DummySource: PetrolStationsSource {
 struct FetchAllTests {
     @Test("the resulting array after a fetch should contain all the stations from the provided sources")
     func fetchAll() async throws {
-        let source1 = DummySource(injectedStations: [.init(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
-        let source2 = DummySource(injectedStations: [.init(id: "1", brand: "OmanOil", name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
+        let source1 = DummySource(injectedStations: [.init(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
+        let source2 = DummySource(injectedStations: [.init(id: "1", brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
         
         let expectedStations: [PetrolStation] = [
-            .init(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
-            .init(id: "1", brand: "OmanOil", name: "OmanStation", location: .init(latitude: 22, longitude: 22))
+            .init(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
+            .init(id: "1", brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))
         ]
         
         let stations = try await fetchAllFrom {
@@ -81,19 +81,19 @@ struct FetchAllTests {
         "the resulting array after a fetch should contain only the stations from the sources that are conditionally passed as arguments",
         arguments: [
             (true, [
-                PetrolStation(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))
+                PetrolStation(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))
                     ]
             ),
             (false, [
-                PetrolStation(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
-                PetrolStation(id: "1", brand: "OmanOil", name: "OmanStation", location: .init(latitude: 22, longitude: 22))
+                PetrolStation(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2)),
+                PetrolStation(id: "1", brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))
                     ]
             ),
             ]
     )
     func fetchConditionally(_ include: Bool, _ expected: [PetrolStation]) async throws {
-        let source1 = DummySource(injectedStations: [.init(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
-        let source2 = DummySource(injectedStations: [.init(id: "1", brand: "OmanOil", name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
+        let source1 = DummySource(injectedStations: [.init(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
+        let source2 = DummySource(injectedStations: [.init(id: "1", brand: .oomco, name: "OmanStation", location: .init(latitude: 22, longitude: 22))])
         let stations = try await fetchAllFrom {
             if include {
                 source1
@@ -110,12 +110,12 @@ struct FetchAllTests {
     @Test(
         "the resulting array after a fetch should contain only the stations from the sources that are conditionally passed as arguments",
         arguments: [
-            (true, [PetrolStation(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))]),
+            (true, [PetrolStation(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))]),
             (false, [])
         ]
     )
     func fetchWithSimpleIf(_ include: Bool, _ expected: [PetrolStation]) async throws {
-        let source = DummySource(injectedStations: [.init(id: "1", brand: "Shell", name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
+        let source = DummySource(injectedStations: [.init(id: "1", brand: .shell, name: "ShellStation", location: .init(latitude: 2, longitude: 2))])
         
         let stations = try await fetchAllFrom {
             if include {

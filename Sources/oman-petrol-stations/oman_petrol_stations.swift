@@ -39,18 +39,9 @@ enum OutputFormat: ExpressibleByArgument, CaseIterable {
     case kml
 }
 
-enum PetrolCompany: String, ExpressibleByArgument, CaseIterable {
-    case oomco
-    case shell
-    case almaha
-    
+extension PetrolCompany: ExpressibleByArgument {
     init?(argument: String) {
-        switch argument.lowercased() {
-        case "oomco": self = .oomco
-        case "shell": self = .shell
-        case "almaha": self = .almaha
-        default: return nil
-        }
+        self.init(rawValue: argument.lowercased())
     }
 }
 
