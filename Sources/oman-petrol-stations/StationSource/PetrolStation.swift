@@ -31,7 +31,6 @@ struct PetrolStation: Sendable, Hashable {
         let longitude: Double
     }
     
-    let id: String
     let brand: PetrolCompany
     let name: String
     let location: Location

@@ -44,16 +44,11 @@ struct ShellStationsSourceTests {
         
         let stations = try await source.getAllPetrolStations()
         
-        let setOfIds = stations.uniqueValues(of: \.id)
-        let setOfNames = stations.uniqueValues(of: \.name)
-        
+        let names = stations.uniqueValues(of: \.name)
+
         #expect(stations.count == 2)
-        
-        #expect(setOfIds.contains("12662228"))
-        #expect(setOfIds.contains("12540496"))
-        
-        #expect(setOfNames.contains("SAIH AL RAWL SS"))
-        #expect(setOfNames.contains("ZAMAIM SS"))
+        #expect(names.contains("SAIH AL RAWL SS"))
+        #expect(names.contains("ZAMAIM SS"))
         
     }
     

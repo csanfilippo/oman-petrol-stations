@@ -52,7 +52,7 @@ struct CSVPetrolStationSerializerTests {
     
     @Test("saving an not empty array will result in a csv file all the lines")
     func notEmptyArray() throws {
-        let emptyArray: [PetrolStation] = [.init(id: "1", brand: .shell, name: "Test", location: .init(latitude: 2.2, longitude: 3.2))]
+        let emptyArray: [PetrolStation] = [.init(brand: .shell, name: "Test", location: .init(latitude: 2.2, longitude: 3.2))]
         let serializer = CSVPetrolStationSerializer()
         let inspectableStorage = InspectableStorage()
         try serializer.save(stations: emptyArray, into: inspectableStorage)
@@ -67,7 +67,7 @@ struct CSVPetrolStationSerializerTests {
     
     @Test("station names are capitalized")
     func capitalizedStationName() throws {
-        let emptyArray: [PetrolStation] = [.init(id: "1", brand: .shell, name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))]
+        let emptyArray: [PetrolStation] = [.init(brand: .shell, name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))]
         let serializer = CSVPetrolStationSerializer()
         let inspectableStorage = InspectableStorage()
         try serializer.save(stations: emptyArray, into: inspectableStorage)

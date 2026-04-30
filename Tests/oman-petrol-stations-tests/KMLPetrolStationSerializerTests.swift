@@ -54,7 +54,7 @@ struct KMLPetrolStationSerializerTests {
     func testSingleStationIncludesPlacemarkCorrectly() throws {
         // Arrange
         let stations = [
-            PetrolStation(id: "1", brand: .shell, name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
+            PetrolStation(brand: .shell, name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
@@ -73,7 +73,7 @@ struct KMLPetrolStationSerializerTests {
     func testCapitalizeStationName() throws {
         // Arrange
         let stations = [
-            PetrolStation(id: "1", brand: .shell, name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
+            PetrolStation(brand: .shell, name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let storage = InspectableStorage()
@@ -92,7 +92,6 @@ struct KMLPetrolStationSerializerTests {
     func testEscapingSpecialCharactersInName() throws {
         let stations = [
             PetrolStation(
-                id: "1",
                 brand: .shell,
                 name: "A&B <C> \"D\" 'E'",
                 location: .init(latitude: 1.0, longitude: 1.0)

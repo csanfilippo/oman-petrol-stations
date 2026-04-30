@@ -48,10 +48,10 @@ struct MergeTests {
     @Test("merge of non empty arrays consists only of unique elements")
     func mergingArrays() async throws {
         
-        let stations1: [PetrolStation] = [.init(id: "1", brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1))]
+        let stations1: [PetrolStation] = [.init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1))]
         let stations2: [PetrolStation] = [
-            .init(id: "1", brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(id: "2", brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
         ]
         
         let arrayOfArrays = [stations1, stations2]
@@ -59,8 +59,8 @@ struct MergeTests {
         let merged = arrayOfArrays.merge()
         
         let expected: [PetrolStation] = [
-            .init(id: "1", brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(id: "2", brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
         ]
         
         #expect(merged == expected)
@@ -70,13 +70,13 @@ struct MergeTests {
     func preserveOrder() async throws {
         
         let stations1: [PetrolStation] = [
-            .init(id: "1", brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(id: "3", brand: .shell, name: "Shell3", location: .init(latitude: 3, longitude: 3))
+            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell3", location: .init(latitude: 3, longitude: 3))
         ]
         
         let stations2: [PetrolStation] = [
-            .init(id: "1", brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(id: "2", brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
         ]
         
         let arrayOfArrays = [stations1, stations2]
@@ -84,9 +84,9 @@ struct MergeTests {
         let merged = arrayOfArrays.merge()
         
         let expected: [PetrolStation] = [
-            .init(id: "1", brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(id: "3", brand: .shell, name: "Shell3", location: .init(latitude: 3, longitude: 3)),
-            .init(id: "2", brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell3", location: .init(latitude: 3, longitude: 3)),
+            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
         ]
         
         #expect(merged == expected)

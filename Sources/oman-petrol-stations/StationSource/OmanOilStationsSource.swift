@@ -64,7 +64,6 @@ final class OmanOilStationsSource: PetrolStationsSource {
             }
             
             return .init(
-                id: String(describing: station.id),
                 brand: .oomco,
                 name: station.name,
                 location: .init(latitude: latitude, longitude: longitude)

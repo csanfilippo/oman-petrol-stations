@@ -70,7 +70,6 @@ final class AlMahaStationsSource: PetrolStationsSource {
             
             
             stations.append(.init(
-                id: "",
                 brand: .almaha,
                 name: rawName,
                 location: .init(latitude: latitude, longitude: longitude)

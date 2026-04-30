@@ -74,7 +74,6 @@ final class ShellStationsSource: PetrolStationsSource {
             .filter { $0.isActive }
             .map {
                 .init(
-                    id: $0.id,
                     brand: .shell,
                     name: $0.name,
                     location: .init(

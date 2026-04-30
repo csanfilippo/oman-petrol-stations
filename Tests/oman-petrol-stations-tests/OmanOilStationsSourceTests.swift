@@ -70,8 +70,7 @@ struct OmanOilStationsSourceTests {
 
         #expect(stations.count == 2)
         
-        let first = try #require(stations.first { $0.id == "1" })
-        #expect(first.name == "Station 1")
+        let first = try #require(stations.first { $0.name == "Station 1" })
         #expect(first.brand == .oomco)
         #expect(first.location.latitude == 23.61388)
         #expect(first.location.longitude == 58.5922)
