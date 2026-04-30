@@ -60,7 +60,7 @@ struct PetrolCompanyList: ExpressibleByArgument, ExpressibleByArrayLiteral {
     }
     
     var defaultValueDescription: String {
-        companies.map { String(describing: $0) }.joined(separator: ",")
+        companies.sorted { $0.rawValue < $1.rawValue }.map(\.rawValue).joined(separator: ",")
     }
 }
 
