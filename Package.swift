@@ -6,12 +6,12 @@ let package = Package(
     name: "oman-petrol-stations",
     platforms: [.macOS(.v26)],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
-        .package(url: "https://github.com/apple/swift-log", from: "1.6.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.7.1"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.12.0"),
         .package(url: "https://github.com/yaslab/CSV.swift", from: "2.5.2"),
-        .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "6.0.1"),
-        .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
-        .package(url: "https://github.com/mattt/Replay.git", from: "0.3.0")
+        .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "6.1.0"),
+        .package(url: "https://github.com/apple/swift-collections", from: "1.4.1"),
+        .package(url: "https://github.com/mattt/Replay.git", from: "0.4.0")
     ],
     targets: [
         .executableTarget(
