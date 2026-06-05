@@ -22,7 +22,6 @@
  SOFTWARE.
  */
 
-import Logging
 import Foundation
 import ArgumentParser
 
@@ -102,12 +101,25 @@ private func exportStations(
     outputPath: String,
     session: URLSession = .shared
 ) async throws {
+    let sortedCompanies = companies.sorted(by: { $0.rawValue < $1.rawValue })
+
+    for company in sortedCompanies {
+        print("Fetching \(company.displayName) stations...")
+    }
+
     let stations = try await fetchAllFrom {
-        for company in companies.sorted(by: { $0.rawValue < $1.rawValue }) {
+        for company in sortedCompanies {
             company.makeSource(session: session)
         }
     }
+
+    let countsByBrand = Dictionary(grouping: stations, by: \.brand).mapValues(\.count)
+    for company in sortedCompanies {
+        print("  \(company.displayName): \(countsByBrand[company] ?? 0)")
+    }
+
     try serializerFor(format).save(stations: stations, into: File(absolutePath: outputPath))
+    print("Exported \(stations.count) stations to \(outputPath)")
 }
 
 private extension PetrolCompany {

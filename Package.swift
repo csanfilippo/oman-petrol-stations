@@ -7,7 +7,6 @@ let package = Package(
     platforms: [.macOS(.v26)],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.7.1"),
-        .package(url: "https://github.com/apple/swift-log", from: "1.12.0"),
         .package(url: "https://github.com/yaslab/CSV.swift", from: "2.5.2"),
         .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "6.1.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.4.1"),
@@ -20,7 +19,6 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "CSV", package: "CSV.swift"),
                 .product(name: "Kanna", package: "Kanna"),
-                .product(name: "Logging", package: "swift-log"),
                 .product(name: "OrderedCollections", package: "swift-collections")
             ]
         ),

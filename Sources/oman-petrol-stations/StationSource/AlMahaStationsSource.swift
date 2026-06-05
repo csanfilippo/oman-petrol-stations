@@ -24,7 +24,6 @@
 
 import Kanna
 import Foundation
-import Logging
 
 struct AlMahaStationsSource: PetrolStationsSource {
     
@@ -37,8 +36,6 @@ struct AlMahaStationsSource: PetrolStationsSource {
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
-        logger.debug("fetching Al Maha stations")
-
         var request = URLRequest(url: self.url)
         
         request.httpMethod = "POST"
@@ -68,7 +65,7 @@ struct AlMahaStationsSource: PetrolStationsSource {
             }
             
             guard let (latitude, longitude) = locationFrom(onClick: loadMapFunc) else {
-                logger.warning("skipping Al Maha station with unparseable coordinates: name=\(rawName) onclick=\(loadMapFunc)")
+                fputs("warning: skipping Al Maha station with unparseable coordinates: name=\(rawName) onclick=\(loadMapFunc)\n", stderr)
                 continue
             }
             
@@ -85,7 +82,6 @@ struct AlMahaStationsSource: PetrolStationsSource {
             throw .noData
         }
 
-        logger.info("fetched \(stations.count) Al Maha stations")
         return stations
     }
     

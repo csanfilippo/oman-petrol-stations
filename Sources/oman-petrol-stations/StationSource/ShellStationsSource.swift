@@ -23,7 +23,6 @@
  */
 
 import Foundation
-import Logging
 
 private struct ShellStation: Decodable {
     
@@ -59,8 +58,6 @@ struct ShellStationsSource: PetrolStationsSource {
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
-        logger.debug("fetching Shell stations")
-
         let request = URLRequest(url: url)
         let data = try await performRequest(request, session: session)
 
@@ -82,7 +79,6 @@ struct ShellStationsSource: PetrolStationsSource {
                 )
             }
 
-        logger.info("fetched \(stations.count) Shell stations")
         return stations
     }
 }
