@@ -62,6 +62,7 @@ struct OmanOilStationsSource: PetrolStationsSource {
 
         let stations = raw.compactMap { station -> PetrolStation? in
             guard let latitude = Double(station.latitude), let longitude = Double(station.longitude) else {
+                logger.warning("skipping Oman Oil station with unparseable coordinates: id=\(station.id) locX=\(station.latitude) locY=\(station.longitude)")
                 return nil
             }
             return PetrolStation(brand: .oomco, name: station.name, location: .init(latitude: latitude, longitude: longitude))

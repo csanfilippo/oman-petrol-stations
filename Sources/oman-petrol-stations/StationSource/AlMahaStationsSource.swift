@@ -68,6 +68,7 @@ struct AlMahaStationsSource: PetrolStationsSource {
             }
             
             guard let (latitude, longitude) = locationFrom(onClick: loadMapFunc) else {
+                logger.warning("skipping Al Maha station with unparseable coordinates: name=\(rawName) onclick=\(loadMapFunc)")
                 continue
             }
             
