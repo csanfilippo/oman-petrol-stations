@@ -86,29 +86,9 @@ struct AlMahaStationsSource: PetrolStationsSource {
     }
     
     private func locationFrom(onClick: String) -> (latitude: Double, longitude: Double)? {
-        
-        guard let firstTick = onClick.firstIndex(where: { character in character == "'" }) else {
+        guard let match = onClick.firstMatch(of: /'(-?\d+\.?\d*)'\s*,\s*'(-?\d+\.?\d*)'/) else {
             return nil
         }
-        
-        guard let lastTick = onClick.lastIndex(where: { character in character == "'" }) else {
-            return nil
-        }
-        
-        var substring = String(onClick[firstTick...lastTick])
-        
-        substring.removeAll(where: { char in char == "'"})
-        
-        let split = substring
-            .split(whereSeparator: {$0 == ","})
-            .map({ String($0).trimmingCharacters(in: .whitespacesAndNewlines) })
-            .filter { !$0.isEmpty }
-            .compactMap { Double($0) }
-        
-        guard split.count >= 2 else {
-            return nil
-        }
-        
-        return (latitude: split[0], longitude: split[1])
+        return (latitude: Double(match.1)!, longitude: Double(match.2)!)
     }
 }
