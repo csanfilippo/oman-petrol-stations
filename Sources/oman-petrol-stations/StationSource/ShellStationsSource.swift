@@ -68,7 +68,7 @@ struct ShellStationsSource: PetrolStationsSource {
             throw .invalidData
         }
 
-        guard responseBody.locations.count > 0 else {
+        guard !responseBody.locations.isEmpty else {
             throw .noData
         }
 

@@ -105,7 +105,7 @@ struct AlMahaStationsSource: PetrolStationsSource {
         let split = substring
             .split(whereSeparator: {$0 == ","})
             .map({ String($0).trimmingCharacters(in: .whitespacesAndNewlines) })
-            .filter { $0.count > 0 }
+            .filter { !$0.isEmpty }
             .compactMap { Double($0) }
         
         guard split.count >= 2 else {
