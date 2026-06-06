@@ -24,19 +24,25 @@
 
 import Foundation
 
-protocol Storage {
+protocol Output {
     func save(_ string: String) throws
 }
 
-final class File: Storage {
-    
+final class File: Output {
+
     private let absolutePath: URL
-    
+
     init(absolutePath: String) {
         self.absolutePath = URL(filePath: absolutePath)
     }
-    
+
     func save(_ string: String) throws {
         try string.write(to: absolutePath, atomically: true, encoding: .utf8)
+    }
+}
+
+final class Stdout: Output {
+    func save(_ string: String) throws {
+        print(string, terminator: "")
     }
 }

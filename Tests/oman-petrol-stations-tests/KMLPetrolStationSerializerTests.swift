@@ -33,9 +33,9 @@ struct KMLPetrolStationSerializerTests {
     @Test("empty station list produces valid KML document with no Placemarks")
     func emptyStationListProducesKMLWithNoPlacemarks() throws {
         let serializer = KMLPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: [], into: storage)
+        try serializer.save(stations: [], into: output)
 
         let expected = """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -45,7 +45,7 @@ struct KMLPetrolStationSerializerTests {
           </Document>
         </kml>
         """
-        #expect(storage.storage == expected)
+        #expect(output.content == expected)
     }
 
     @Test("station is serialized as a Placemark with longitude,latitude coordinate order")
@@ -54,15 +54,15 @@ struct KMLPetrolStationSerializerTests {
             PetrolStation(brand: .shell, name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
-        #expect(storage.storage.contains("<Placemark>"))
-        #expect(storage.storage.contains("<name>Test Station</name>"))
-        #expect(storage.storage.contains("<coordinates>3.0,2.0</coordinates>"))
-        #expect(storage.storage.contains("<description>Brand: Shell</description>"))
-        #expect(storage.storage.contains("</Placemark>"))
+        #expect(output.content.contains("<Placemark>"))
+        #expect(output.content.contains("<name>Test Station</name>"))
+        #expect(output.content.contains("<coordinates>3.0,2.0</coordinates>"))
+        #expect(output.content.contains("<description>Brand: Shell</description>"))
+        #expect(output.content.contains("</Placemark>"))
     }
 
     @Test("multiple stations produce one Placemark each")
@@ -72,16 +72,16 @@ struct KMLPetrolStationSerializerTests {
             .init(brand: .oomco, name: "Station B", location: .init(latitude: 24.0, longitude: 59.0))
         ]
         let serializer = KMLPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
-        let placemarkCount = storage.storage.components(separatedBy: "<Placemark>").count - 1
+        let placemarkCount = output.content.components(separatedBy: "<Placemark>").count - 1
         #expect(placemarkCount == 2)
-        #expect(storage.storage.contains("<name>Station A</name>"))
-        #expect(storage.storage.contains("<description>Brand: Shell</description>"))
-        #expect(storage.storage.contains("<name>Station B</name>"))
-        #expect(storage.storage.contains("<description>Brand: Oman Oil</description>"))
+        #expect(output.content.contains("<name>Station A</name>"))
+        #expect(output.content.contains("<description>Brand: Shell</description>"))
+        #expect(output.content.contains("<name>Station B</name>"))
+        #expect(output.content.contains("<description>Brand: Oman Oil</description>"))
     }
 
     @Test("capitalizes station names")
@@ -90,11 +90,11 @@ struct KMLPetrolStationSerializerTests {
             PetrolStation(brand: .shell, name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
-        #expect(storage.storage.contains("<name>Test Station</name>"))
+        #expect(output.content.contains("<name>Test Station</name>"))
     }
 
     @Test("XML-escapes special characters in station name")
@@ -107,11 +107,11 @@ struct KMLPetrolStationSerializerTests {
             )
         ]
         let serializer = KMLPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
-        #expect(storage.storage.contains("<name>A&amp;B &lt;C&gt; &quot;D&quot; &apos;E&apos;</name>"))
-        #expect(storage.storage.contains("<description>Brand: Shell</description>"))
+        #expect(output.content.contains("<name>A&amp;B &lt;C&gt; &quot;D&quot; &apos;E&apos;</name>"))
+        #expect(output.content.contains("<description>Brand: Shell</description>"))
     }
 }

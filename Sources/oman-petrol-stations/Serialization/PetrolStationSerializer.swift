@@ -30,7 +30,7 @@ enum SerializationFormat {
 }
 
 protocol PetrolStationSerializer {
-    func save(stations: [PetrolStation], into: some Storage) throws
+    func save(stations: [PetrolStation], into: some Output) throws
 }
 
 func serializerFor(_ format: SerializationFormat) -> any PetrolStationSerializer {
@@ -43,7 +43,7 @@ func serializerFor(_ format: SerializationFormat) -> any PetrolStationSerializer
 }
 
 final class KMLPetrolStationSerializer: PetrolStationSerializer {
-    func save(stations: [PetrolStation], into storage: some Storage) throws {
+    func save(stations: [PetrolStation], into output: some Output) throws {
         
         let header = """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -60,7 +60,7 @@ final class KMLPetrolStationSerializer: PetrolStationSerializer {
         guard stations.isEmpty == false else {
             
             let text = header + "\n" + footer
-            try storage.save(text)
+            try output.save(text)
             return
         }
 
@@ -82,7 +82,7 @@ final class KMLPetrolStationSerializer: PetrolStationSerializer {
 
         let text = [header, placemarks, footer].joined(separator: "\n")
         
-        try storage.save(text)
+        try output.save(text)
     }
     
     private func escape(_ s: String) -> String {
@@ -97,11 +97,11 @@ final class KMLPetrolStationSerializer: PetrolStationSerializer {
 }
 
 final class CSVPetrolStationSerializer: PetrolStationSerializer {
-    func save(stations: [PetrolStation], into storage: some Storage) throws {
+    func save(stations: [PetrolStation], into output: some Output) throws {
         let header = "Name,Brand,Latitude,Longitude"
         
         guard stations.isEmpty == false else {
-            try storage.save(header)
+            try output.save(header)
             return
         }
         
@@ -116,7 +116,7 @@ final class CSVPetrolStationSerializer: PetrolStationSerializer {
         
         let text = [header, content].joined(separator: "\n")
         
-        try storage.save(text)
+        try output.save(text)
     }
     
     private func format(_ value: Double) -> String { String(format: "%.6f", value) }

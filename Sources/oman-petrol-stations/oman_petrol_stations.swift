@@ -77,8 +77,8 @@ struct oman_petrol_stations: AsyncParsableCommand {
         version: "1.2.0"
     )
     
-    @Option(help: "The path of output file")
-    var outputFilePath: String
+    @Option(help: "The path of output file (omit to write to stdout)")
+    var outputFilePath: String?
     
     @Option(help: "The format of output file")
     var format: SerializationFormat = .kml
@@ -98,13 +98,14 @@ struct oman_petrol_stations: AsyncParsableCommand {
 private func exportStations(
     companies: Set<PetrolCompany>,
     format: SerializationFormat,
-    outputPath: String,
+    outputPath: String?,
     session: URLSession = .shared
 ) async throws {
     let sortedCompanies = companies.sorted(by: { $0.rawValue < $1.rawValue })
+    let progress: (String) -> Void = outputPath != nil ? { print($0) } : { fputs($0 + "\n", stderr) }
 
     for company in sortedCompanies {
-        print("Fetching \(company.displayName) stations...")
+        progress("Fetching \(company.displayName) stations...")
     }
 
     let stations = try await fetchAllFrom {
@@ -115,11 +116,12 @@ private func exportStations(
 
     let countsByBrand = Dictionary(grouping: stations, by: \.brand).mapValues(\.count)
     for company in sortedCompanies {
-        print("  \(company.displayName): \(countsByBrand[company] ?? 0)")
+        progress("  \(company.displayName): \(countsByBrand[company] ?? 0)")
     }
 
-    try serializerFor(format).save(stations: stations, into: File(absolutePath: outputPath))
-    print("Exported \(stations.count) stations to \(outputPath)")
+    let output: any Output = outputPath.map { File(absolutePath: $0) } ?? Stdout()
+    try serializerFor(format).save(stations: stations, into: output)
+    progress("Exported \(stations.count) stations to \(outputPath ?? "stdout")")
 }
 
 private extension PetrolCompany {

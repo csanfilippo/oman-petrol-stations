@@ -27,11 +27,11 @@ import Foundation
 
 @testable import oman_petrol_stations
 
-final class InspectableStorage: Storage {
-    private(set) var storage: String = ""
+final class InspectableOutput: Output {
+    private(set) var content: String = ""
 
     func save(_ string: String) throws {
-        storage = string
+        content = string
     }
 }
 
@@ -41,11 +41,11 @@ struct CSVPetrolStationSerializerTests {
     @Test("empty station list produces header row only")
     func emptyStationListProducesHeaderOnly() throws {
         let serializer = CSVPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: [], into: storage)
+        try serializer.save(stations: [], into: output)
 
-        #expect(storage.storage == "Name,Brand,Latitude,Longitude")
+        #expect(output.content == "Name,Brand,Latitude,Longitude")
     }
 
     @Test("single station is serialized as a CSV row with brand display name")
@@ -54,15 +54,15 @@ struct CSVPetrolStationSerializerTests {
             .init(brand: .shell, name: "Test", location: .init(latitude: 2.2, longitude: 3.2))
         ]
         let serializer = CSVPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
         let expected = """
             Name,Brand,Latitude,Longitude
             Test,Shell,2.200000,3.200000
             """
-        #expect(storage.storage == expected)
+        #expect(output.content == expected)
     }
 
     @Test("multiple stations produce one row each with correct brand display names")
@@ -72,11 +72,11 @@ struct CSVPetrolStationSerializerTests {
             .init(brand: .oomco, name: "Station B", location: .init(latitude: 24.0, longitude: 59.0))
         ]
         let serializer = CSVPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
-        let lines = storage.storage.components(separatedBy: "\n")
+        let lines = output.content.components(separatedBy: "\n")
         #expect(lines.count == 3)
         #expect(lines[0] == "Name,Brand,Latitude,Longitude")
         #expect(lines[1] == "Station A,Shell,23.000000,58.000000")
@@ -89,14 +89,14 @@ struct CSVPetrolStationSerializerTests {
             .init(brand: .shell, name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))
         ]
         let serializer = CSVPetrolStationSerializer()
-        let storage = InspectableStorage()
+        let output = InspectableOutput()
 
-        try serializer.save(stations: stations, into: storage)
+        try serializer.save(stations: stations, into: output)
 
         let expected = """
             Name,Brand,Latitude,Longitude
             Test,Shell,2.200000,3.200000
             """
-        #expect(storage.storage == expected)
+        #expect(output.content == expected)
     }
 }
