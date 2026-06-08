@@ -74,7 +74,7 @@ struct oman_petrol_stations: AsyncParsableCommand {
         This tool downloads station data from multiple providers and serializes it \
         into a chosen output format (KML or CSV)
         """,
-        version: "1.2.0"
+        version: "1.2.1"
     )
     
     @Option(help: "The path of output file (omit to write to stdout)")
