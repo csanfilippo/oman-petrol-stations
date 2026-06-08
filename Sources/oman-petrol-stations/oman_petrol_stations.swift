@@ -87,49 +87,13 @@ struct oman_petrol_stations: AsyncParsableCommand {
     var petrolCompanyList: PetrolCompanyList = [.shell, .oomco, .almaha]
     
     mutating func run() async throws {
-        try await exportStations(
+        
+        let output: any Output = output(for: outputFilePath)
+        
+        try await StationExporter.export(
             companies: petrolCompanyList.companies,
             format: format,
-            outputPath: outputFilePath
+            output: output
         )
-    }
-}
-
-private func exportStations(
-    companies: Set<PetrolCompany>,
-    format: SerializationFormat,
-    outputPath: String?,
-    session: URLSession = .shared
-) async throws {
-    let sortedCompanies = companies.sorted(by: { $0.rawValue < $1.rawValue })
-    let progress: (String) -> Void = outputPath != nil ? { print($0) } : { fputs($0 + "\n", stderr) }
-
-    for company in sortedCompanies {
-        progress("Fetching \(company.displayName) stations...")
-    }
-
-    let stations = try await fetchAllFrom {
-        for company in sortedCompanies {
-            company.makeSource(session: session)
-        }
-    }
-
-    let countsByBrand = Dictionary(grouping: stations, by: \.brand).mapValues(\.count)
-    for company in sortedCompanies {
-        progress("  \(company.displayName): \(countsByBrand[company] ?? 0)")
-    }
-
-    let output: any Output = outputPath.map { File(absolutePath: $0) } ?? Stdout()
-    try serializerFor(format).save(stations: stations, into: output)
-    progress("Exported \(stations.count) stations to \(outputPath ?? "stdout")")
-}
-
-private extension PetrolCompany {
-    func makeSource(session: URLSession) -> any PetrolStationsSource {
-        switch self {
-        case .almaha: AlMahaStationsSource(session: session)
-        case .oomco:  OmanOilStationsSource(session: session)
-        case .shell:  ShellStationsSource(session: session)
-        }
     }
 }

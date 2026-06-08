@@ -24,33 +24,10 @@
 
 import Foundation
 
-protocol Output {
-    func save(_ string: String) throws
-}
-
-final class File: Output {
-
-    private let absolutePath: URL
-
-    init(absolutePath: String) {
-        self.absolutePath = URL(filePath: absolutePath)
+func output(for path: String?) -> any Output {
+    if let path {
+        return File(absolutePath: path)
+    } else {
+        return Stdout()
     }
-
-    func save(_ string: String) throws {
-        try string.write(to: absolutePath, atomically: true, encoding: .utf8)
-    }
-}
-
-final class Stdout: Output {
-    func save(_ string: String) throws {
-        print(string, terminator: "")
-    }
-}
-
-extension File: CustomStringConvertible {
-    var description: String { absolutePath.path() }
-}
-
-extension Stdout: CustomStringConvertible {
-    var description: String { "stdout" }
 }
