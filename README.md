@@ -1,5 +1,12 @@
 # oman-petrol-stations
 
+<picture>
+  <source srcset="https://github.com/user-attachments/assets/338363b5-8080-4b96-bb3c-92ac6f264ab2" media="(prefers-color-scheme: dark)">
+  <source srcset="https://github.com/user-attachments/assets/338363b5-8080-4b96-bb3c-92ac6f264ab2" media="(prefers-color-scheme: light)">
+  <img src="https://github.com/user-attachments/assets/338363b5-8080-4b96-bb3c-92ac6f264ab2" alt="oman-petrol-stations-icon" style="width: 20%;">
+</picture>
+
+
 A small Swift command line tool for macOS that downloads location and metadata for every petrol station operated by the three main Omani providers: Oman Oil, Shell, and Al Maha. 
 Export results as CSV or KML for mapping and offline use.
 
