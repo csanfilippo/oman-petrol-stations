@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattt/Replay.git",
       "state" : {
-        "revision" : "f641f9c06a4a01c73342aa0879a860591b608418",
-        "version" : "0.4.0"
+        "revision" : "80605d41b4dbc568202d799d3b3d9bbb86f29e1e",
+        "version" : "0.6.0"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections",
       "state" : {
-        "revision" : "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
-        "version" : "1.6.0"
+        "revision" : "98ef3c98609a1e31b7e157b5b619579001a789d6",
+        "version" : "1.7.1"
       }
     }
   ],
