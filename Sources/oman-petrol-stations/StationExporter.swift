@@ -25,29 +25,39 @@
 import Foundation
 
 struct StationExporter {
-    static func export(companies: Set<PetrolCompany>, format: SerializationFormat, output: some Output) async throws -> Void {
-        let session: URLSession = .shared
-        
+    static func export(
+        companies: Set<PetrolCompany>,
+        format: SerializationFormat,
+        output: some Output,
+        reporter: any ExportProgressReporter = ConsoleProgressReporter(),
+        makeSource: @Sendable (PetrolCompany) -> any PetrolStationsSource = { $0.makeSource(session: .shared) }
+    ) async throws -> Void {
         let sortedCompanies = companies.sorted(by: { $0.rawValue < $1.rawValue })
-        let progress: (String) -> Void = { print($0) }
-        
-        for company in sortedCompanies {
-            progress("Fetching \(company.displayName) stations...")
-        }
 
         let stations = try await fetchAllFrom {
             for company in sortedCompanies {
-                company.makeSource(session: session)
+                ReportingStationsSource(wrapped: makeSource(company), company: company, reporter: reporter)
             }
         }
-
+        
         let countsByBrand = Dictionary(grouping: stations, by: \.brand).mapValues(\.count)
         for company in sortedCompanies {
-            progress("  \(company.displayName): \(countsByBrand[company] ?? 0)")
+            await reporter.report("  \(company.displayName): \(countsByBrand[company] ?? 0)")
         }
 
         try serializerFor(format).save(stations: stations, into: output)
-        progress("Exported \(stations.count) stations to \(output)")
+        await reporter.report("Exported \(stations.count) stations to \(output)")
+    }
+}
+
+private struct ReportingStationsSource: PetrolStationsSource {
+    let wrapped: any PetrolStationsSource
+    let company: PetrolCompany
+    let reporter: any ExportProgressReporter
+
+    func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
+        await reporter.report("Fetching \(company.displayName) stations...")
+        return try await wrapped.getAllPetrolStations()
     }
 }
 
