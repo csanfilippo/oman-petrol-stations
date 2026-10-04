@@ -68,9 +68,9 @@ struct oman_petrol_stations: AsyncParsableCommand {
         abstract: "Fetches petrol stations in Oman and exports them to a file.",
         discussion: """
         This tool downloads station data from multiple providers and serializes it \
-        into a chosen output format (KML or CSV)
+        into a chosen output format (KML, CSV, or GeoJSON)
         """,
-        version: "1.2.1"
+        version: "1.3.0"
     )
     
     @Option(help: "The path of output file (omit to write to stdout)")
