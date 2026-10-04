@@ -29,7 +29,8 @@ protocol ExportProgressReporter: Sendable {
 }
 
 struct ConsoleProgressReporter: ExportProgressReporter {
+    // stderr, because stdout may carry the export itself when no output file is given.
     func report(_ message: String) async {
-        print(message)
+        fputs(message + "\n", stderr)
     }
 }
