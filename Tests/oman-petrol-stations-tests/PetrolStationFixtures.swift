@@ -22,35 +22,14 @@
  SOFTWARE.
  */
 
-import Foundation
+@testable import oman_petrol_stations
 
-struct PetrolStation: Sendable, Hashable {
-    
-    struct Location: Sendable, Hashable {
-        let latitude: Double
-        let longitude: Double
-
-        init?(latitude: Double, longitude: Double) {
-            guard (-90...90).contains(latitude), (-180...180).contains(longitude) else {
-                return nil
-            }
-            self.latitude = latitude
-            self.longitude = longitude
+extension PetrolStation.Location {
+    // Fixture coordinates are hand-picked; an invalid one is a bug in the test, so trap rather than propagate.
+    static func fixture(latitude: Double, longitude: Double) -> Self {
+        guard let location = Self(latitude: latitude, longitude: longitude) else {
+            preconditionFailure("invalid fixture coordinates: \(latitude), \(longitude)")
         }
-    }
-    
-    let brand: PetrolCompany
-    let name: String
-    let location: Location
-}
-
-
-extension PetrolStation: CustomStringConvertible {
-    var description: String {
-                        """
-                        Name: \(name)
-                        Brand: \(brand.displayName)
-                        Position: \(location.latitude)-\(location.longitude)\n
-                        """
+        return location
     }
 }

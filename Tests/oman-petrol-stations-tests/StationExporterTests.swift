@@ -79,11 +79,11 @@ struct StationExporterTests {
                 switch company {
                 case .shell:
                     DummySource(injectedStations: [
-                        .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1))
+                        .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1))
                     ])
                 case .oomco:
                     DummySource(injectedStations: [
-                        .init(brand: .oomco, name: "Oomco1", location: .init(latitude: 2, longitude: 2))
+                        .init(brand: .oomco, name: "Oomco1", location: .fixture(latitude: 2, longitude: 2))
                     ])
                 case .almaha:
                     DummySource(injectedStations: [])
@@ -113,7 +113,7 @@ struct StationExporterTests {
             reporter: reporter,
             makeSource: { company in
                 DummySource(injectedStations: [
-                    .init(brand: company, name: "station", location: .init(latitude: 0, longitude: 0))
+                    .init(brand: company, name: "station", location: .fixture(latitude: 0, longitude: 0))
                 ])
             }
         )

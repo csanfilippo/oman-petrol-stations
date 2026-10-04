@@ -71,12 +71,12 @@ struct ShellStationsSource: PetrolStationsSource {
 
         let stations = responseBody.locations
             .filter { $0.isActive }
-            .map {
-                PetrolStation(
-                    brand: .shell,
-                    name: $0.name,
-                    location: .init(latitude: $0.latitude, longitude: $0.longitude)
-                )
+            .compactMap { station -> PetrolStation? in
+                guard let location = PetrolStation.Location(latitude: station.latitude, longitude: station.longitude) else {
+                    fputs("warning: skipping Shell station with out-of-range coordinates: id=\(station.id) lat=\(station.latitude) lng=\(station.longitude)\n", stderr)
+                    return nil
+                }
+                return PetrolStation(brand: .shell, name: station.name, location: location)
             }
 
         return stations

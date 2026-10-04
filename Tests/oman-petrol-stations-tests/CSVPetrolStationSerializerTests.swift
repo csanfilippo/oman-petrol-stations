@@ -51,7 +51,7 @@ struct CSVPetrolStationSerializerTests {
     @Test("single station is serialized as a CSV row with brand display name")
     func singleStationSerializedAsCSVRow() throws {
         let stations: [PetrolStation] = [
-            .init(brand: .shell, name: "Test", location: .init(latitude: 2.2, longitude: 3.2))
+            .init(brand: .shell, name: "Test", location: .fixture(latitude: 2.2, longitude: 3.2))
         ]
         let serializer = CSVPetrolStationSerializer()
         let output = InspectableOutput()
@@ -68,8 +68,8 @@ struct CSVPetrolStationSerializerTests {
     @Test("multiple stations produce one row each with correct brand display names")
     func multipleStationsProduceOneRowEach() throws {
         let stations: [PetrolStation] = [
-            .init(brand: .shell, name: "Station A", location: .init(latitude: 23.0, longitude: 58.0)),
-            .init(brand: .oomco, name: "Station B", location: .init(latitude: 24.0, longitude: 59.0))
+            .init(brand: .shell, name: "Station A", location: .fixture(latitude: 23.0, longitude: 58.0)),
+            .init(brand: .oomco, name: "Station B", location: .fixture(latitude: 24.0, longitude: 59.0))
         ]
         let serializer = CSVPetrolStationSerializer()
         let output = InspectableOutput()
@@ -86,7 +86,7 @@ struct CSVPetrolStationSerializerTests {
     @Test("capitalizes station names")
     func capitalizesStationNames() throws {
         let stations: [PetrolStation] = [
-            .init(brand: .shell, name: "TEST", location: .init(latitude: 2.2, longitude: 3.2))
+            .init(brand: .shell, name: "TEST", location: .fixture(latitude: 2.2, longitude: 3.2))
         ]
         let serializer = CSVPetrolStationSerializer()
         let output = InspectableOutput()

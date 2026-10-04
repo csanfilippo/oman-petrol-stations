@@ -102,6 +102,37 @@ struct OmanOilStationsSourceTests {
     }
 
     @Test(
+        "skips stations with out-of-range coordinates",
+        .replay(
+            stubs: [
+                .get(
+                    "https://www.oomco.com/station-search",
+                    200,
+                    ["Content-Type": "application/json"],
+                    {
+                        """
+                        [
+                          {"id":1,"name":"Valid","locX":"23.0","locY":"58.0"},
+                          {"id":2,"name":"Out of range","locX":"23.0","locY":"181.0"}
+                        ]
+                        """
+                    }
+                )
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func skipsStationsWithOutOfRangeCoordinates() async throws {
+        let source = OmanOilStationsSource(session: Replay.session)
+
+        let stations = try await source.getAllPetrolStations()
+
+        #expect(stations.count == 1)
+        #expect(stations[0].name == "Valid")
+    }
+
+    @Test(
         "throws invalidData when response is not a station array",
         .replay(
             stubs: [

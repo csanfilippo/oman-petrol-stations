@@ -75,6 +75,34 @@ struct ShellStationsSourceTests {
     }
 
     @Test(
+        "skips stations with out-of-range coordinates",
+        .replay(
+            stubs: [
+                .get(
+                    "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                    200,
+                    ["Content-Type": "application/json"],
+                    { """
+                    {"locations":[
+                      {"id":"1","name":"Valid","lat":23.0,"lng":58.0,"inactive":false},
+                      {"id":"2","name":"Out of range","lat":91.0,"lng":58.0,"inactive":false}
+                    ]}
+                    """ }
+                )
+            ],
+            matching: [.path], filters: [], scope: .test
+        )
+    )
+    func skipsStationsWithOutOfRangeCoordinates() async throws {
+        let source = ShellStationsSource(session: Replay.session)
+
+        let stations = try await source.getAllPetrolStations()
+
+        #expect(stations.count == 1)
+        #expect(stations[0].name == "Valid")
+    }
+
+    @Test(
         "throws invalidData on malformed response body",
         .replay(
             stubs: [

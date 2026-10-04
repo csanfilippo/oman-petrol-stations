@@ -51,7 +51,7 @@ struct KMLPetrolStationSerializerTests {
     @Test("station is serialized as a Placemark with longitude,latitude coordinate order")
     func stationSerializedAsPlacemarkWithCorrectCoordinateOrder() throws {
         let stations = [
-            PetrolStation(brand: .shell, name: "Test Station", location: .init(latitude: 2.0, longitude: 3.0))
+            PetrolStation(brand: .shell, name: "Test Station", location: .fixture(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let output = InspectableOutput()
@@ -68,8 +68,8 @@ struct KMLPetrolStationSerializerTests {
     @Test("multiple stations produce one Placemark each")
     func multipleStationsProduceOnePlacemarkEach() throws {
         let stations: [PetrolStation] = [
-            .init(brand: .shell, name: "Station A", location: .init(latitude: 23.0, longitude: 58.0)),
-            .init(brand: .oomco, name: "Station B", location: .init(latitude: 24.0, longitude: 59.0))
+            .init(brand: .shell, name: "Station A", location: .fixture(latitude: 23.0, longitude: 58.0)),
+            .init(brand: .oomco, name: "Station B", location: .fixture(latitude: 24.0, longitude: 59.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let output = InspectableOutput()
@@ -87,7 +87,7 @@ struct KMLPetrolStationSerializerTests {
     @Test("capitalizes station names")
     func capitalizesStationNames() throws {
         let stations = [
-            PetrolStation(brand: .shell, name: "TEST STATION", location: .init(latitude: 2.0, longitude: 3.0))
+            PetrolStation(brand: .shell, name: "TEST STATION", location: .fixture(latitude: 2.0, longitude: 3.0))
         ]
         let serializer = KMLPetrolStationSerializer()
         let output = InspectableOutput()
@@ -103,7 +103,7 @@ struct KMLPetrolStationSerializerTests {
             PetrolStation(
                 brand: .shell,
                 name: "A&B <C> \"D\" 'E'",
-                location: .init(latitude: 1.0, longitude: 1.0)
+                location: .fixture(latitude: 1.0, longitude: 1.0)
             )
         ]
         let serializer = KMLPetrolStationSerializer()

@@ -68,14 +68,13 @@ struct AlMahaStationsSource: PetrolStationsSource {
                 fputs("warning: skipping Al Maha station with unparseable coordinates: name=\(rawName) onclick=\(loadMapFunc)\n", stderr)
                 continue
             }
-            
-            
-            stations.append(.init(
-                brand: .almaha,
-                name: rawName,
-                location: .init(latitude: latitude, longitude: longitude)
-                )
-            )
+
+            guard let location = PetrolStation.Location(latitude: latitude, longitude: longitude) else {
+                fputs("warning: skipping Al Maha station with out-of-range coordinates: name=\(rawName) onclick=\(loadMapFunc)\n", stderr)
+                continue
+            }
+
+            stations.append(.init(brand: .almaha, name: rawName, location: location))
         }
         
         guard !stations.isEmpty else {

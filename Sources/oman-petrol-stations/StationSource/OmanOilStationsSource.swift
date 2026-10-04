@@ -62,7 +62,11 @@ struct OmanOilStationsSource: PetrolStationsSource {
                 fputs("warning: skipping Oman Oil station with unparseable coordinates: id=\(station.id) locX=\(station.latitude) locY=\(station.longitude)\n", stderr)
                 return nil
             }
-            return PetrolStation(brand: .oomco, name: station.name, location: .init(latitude: latitude, longitude: longitude))
+            guard let location = PetrolStation.Location(latitude: latitude, longitude: longitude) else {
+                fputs("warning: skipping Oman Oil station with out-of-range coordinates: id=\(station.id) locX=\(station.latitude) locY=\(station.longitude)\n", stderr)
+                return nil
+            }
+            return PetrolStation(brand: .oomco, name: station.name, location: location)
         }
 
         return stations

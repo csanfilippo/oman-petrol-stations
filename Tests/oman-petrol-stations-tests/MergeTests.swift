@@ -39,8 +39,8 @@ struct MergeTests {
     @Test("single array is returned as-is")
     func singleArrayReturnedAsIs() {
         let stations: [PetrolStation] = [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .fixture(latitude: 2, longitude: 2))
         ]
         #expect([stations].merge() == stations)
     }
@@ -48,25 +48,25 @@ struct MergeTests {
     @Test("duplicate stations across arrays are deduplicated")
     func duplicatesAreDeduplicatedAcrossArrays() {
         let stations1: [PetrolStation] = [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1))
         ]
         let stations2: [PetrolStation] = [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .fixture(latitude: 2, longitude: 2))
         ]
 
         let merged = [stations1, stations2].merge()
 
         #expect(merged.count == 2)
         #expect(merged == [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .fixture(latitude: 2, longitude: 2))
         ])
     }
 
     @Test("stations with the same name and location but different brands are not deduplicated")
     func differentBrandsAtSameLocationAreKeptSeparate() {
-        let location = PetrolStation.Location(latitude: 23.0, longitude: 58.0)
+        let location = PetrolStation.Location.fixture(latitude: 23.0, longitude: 58.0)
         let stations1 = [PetrolStation(brand: .shell, name: "Station", location: location)]
         let stations2 = [PetrolStation(brand: .oomco, name: "Station", location: location)]
 
@@ -78,20 +78,20 @@ struct MergeTests {
     @Test("insertion order is preserved across merged arrays")
     func insertionOrderPreservedAcrossArrays() {
         let stations1: [PetrolStation] = [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(brand: .shell, name: "Shell3", location: .init(latitude: 3, longitude: 3))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell3", location: .fixture(latitude: 3, longitude: 3))
         ]
         let stations2: [PetrolStation] = [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell2", location: .fixture(latitude: 2, longitude: 2))
         ]
 
         let merged = [stations1, stations2].merge()
 
         #expect(merged == [
-            .init(brand: .shell, name: "Shell1", location: .init(latitude: 1, longitude: 1)),
-            .init(brand: .shell, name: "Shell3", location: .init(latitude: 3, longitude: 3)),
-            .init(brand: .shell, name: "Shell2", location: .init(latitude: 2, longitude: 2))
+            .init(brand: .shell, name: "Shell1", location: .fixture(latitude: 1, longitude: 1)),
+            .init(brand: .shell, name: "Shell3", location: .fixture(latitude: 3, longitude: 3)),
+            .init(brand: .shell, name: "Shell2", location: .fixture(latitude: 2, longitude: 2))
         ])
     }
 }

@@ -53,6 +53,37 @@ struct AlMahaStationsSourceTests {
     }
 
     @Test(
+        "skips stations with out-of-range coordinates",
+        .replay(
+            stubs: [
+                .post(
+                    "https://www.almaha.com.om/en/map/",
+                    200,
+                    ["Content-Type": "text/html"],
+                    {
+                        """
+                        <html><body>
+                            <div class="products-list" onclick="loadMap('23.588000', '58.382000', '1')"><h5>Valid</h5></div>
+                            <div class="products-list" onclick="loadMap('95.000000', '58.382000', '2')"><h5>Out of range</h5></div>
+                        </body></html>
+                        """
+                    }
+                )
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func skipsStationsWithOutOfRangeCoordinates() async throws {
+        let source = AlMahaStationsSource(session: Replay.session)
+
+        let stations = try await source.getAllPetrolStations()
+
+        #expect(stations.count == 1)
+        #expect(stations[0].name == "Valid")
+    }
+
+    @Test(
         "throws serverError on 5xx response",
         .replay(
             stubs: [
