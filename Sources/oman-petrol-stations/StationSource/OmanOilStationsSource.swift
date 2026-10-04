@@ -69,8 +69,10 @@ struct OmanOilStationsSource: PetrolStationsSource {
             return PetrolStation(brand: .oomco, name: station.name, location: location)
         }
 
+        guard !stations.isEmpty else {
+            throw .noData
+        }
+
         return stations
     }
-    
-    
 }

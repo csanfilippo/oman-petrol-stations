@@ -133,6 +133,36 @@ struct OmanOilStationsSourceTests {
     }
 
     @Test(
+        "throws noData when every station has unparseable or out-of-range coordinates",
+        .replay(
+            stubs: [
+                .get(
+                    "https://www.oomco.com/station-search",
+                    200,
+                    ["Content-Type": "application/json"],
+                    {
+                        """
+                        [
+                          {"id":1,"name":"Bad coords","locX":"N/A","locY":"N/A"},
+                          {"id":2,"name":"Out of range","locX":"23.0","locY":"181.0"}
+                        ]
+                        """
+                    }
+                )
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func throwsNoDataWhenEveryStationIsDropped() async throws {
+        let source = OmanOilStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.noData) {
+            try await source.getAllPetrolStations()
+        }
+    }
+
+    @Test(
         "throws invalidData when response is not a station array",
         .replay(
             stubs: [

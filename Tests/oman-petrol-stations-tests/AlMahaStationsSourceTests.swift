@@ -123,4 +123,33 @@ struct AlMahaStationsSourceTests {
             try await source.getAllPetrolStations()
         }
     }
+
+    @Test(
+        "throws noData when every station has out-of-range coordinates",
+        .replay(
+            stubs: [
+                .post(
+                    "https://www.almaha.com.om/en/map/",
+                    200,
+                    ["Content-Type": "text/html"],
+                    {
+                        """
+                        <html><body>
+                            <div class="products-list" onclick="loadMap('95.000000', '58.382000', '1')"><h5>Out of range</h5></div>
+                        </body></html>
+                        """
+                    }
+                )
+            ],
+            matching: [.path],
+            scope: .test
+        )
+    )
+    func throwsNoDataWhenEveryStationIsDropped() async throws {
+        let source = AlMahaStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.noData) {
+            try await source.getAllPetrolStations()
+        }
+    }
 }

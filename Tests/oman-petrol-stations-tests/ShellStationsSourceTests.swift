@@ -147,6 +147,33 @@ struct ShellStationsSourceTests {
     }
 
     @Test(
+        "throws noData when every station is inactive or out of range",
+        .replay(
+            stubs: [
+                .get(
+                    "https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds",
+                    200,
+                    ["Content-Type": "application/json"],
+                    { """
+                    {"locations":[
+                      {"id":"1","name":"Inactive","lat":23.0,"lng":58.0,"inactive":true},
+                      {"id":"2","name":"Out of range","lat":91.0,"lng":58.0,"inactive":false}
+                    ]}
+                    """ }
+                )
+            ],
+            matching: [.path], filters: [], scope: .test
+        )
+    )
+    func throwsNoDataWhenEveryStationIsDropped() async throws {
+        let source = ShellStationsSource(session: Replay.session)
+
+        await #expect(throws: PetrolStationSourceError.noData) {
+            try await source.getAllPetrolStations()
+        }
+    }
+
+    @Test(
         "throws serverError on 5xx response",
         .replay(
             stubs: [

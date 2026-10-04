@@ -65,10 +65,6 @@ struct ShellStationsSource: PetrolStationsSource {
             throw .invalidData
         }
 
-        guard !responseBody.locations.isEmpty else {
-            throw .noData
-        }
-
         let stations = responseBody.locations
             .filter { $0.isActive }
             .compactMap { station -> PetrolStation? in
@@ -78,6 +74,10 @@ struct ShellStationsSource: PetrolStationsSource {
                 }
                 return PetrolStation(brand: .shell, name: station.name, location: location)
             }
+
+        guard !stations.isEmpty else {
+            throw .noData
+        }
 
         return stations
     }
