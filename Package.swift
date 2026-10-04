@@ -10,7 +10,8 @@ let package = Package(
         .package(url: "https://github.com/yaslab/CSV.swift", from: "2.5.2"),
         .package(url: "https://github.com/tid-kijyun/Kanna.git", from: "6.1.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.4.1"),
-        .package(url: "https://github.com/mattt/Replay.git", from: "0.4.0")
+        .package(url: "https://github.com/mattt/Replay.git", from: "0.1.0"),
+        .package(url: "https://github.com/csanfilippo/sfera.git", from: "0.1.0"),
     ],
     targets: [
         .executableTarget(
@@ -19,7 +20,8 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "CSV", package: "CSV.swift"),
                 .product(name: "Kanna", package: "Kanna"),
-                .product(name: "OrderedCollections", package: "swift-collections")
+                .product(name: "OrderedCollections", package: "swift-collections"),
+                .product(name: "sfera", package: "sfera")
             ]
         ),
         .testTarget(

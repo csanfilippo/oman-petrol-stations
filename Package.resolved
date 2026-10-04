@@ -1,5 +1,5 @@
 {
-  "originHash" : "8fb8c421c7b67ada3dae36794e2840ad843be6a6030481e6dfac707b0c2f0293",
+  "originHash" : "a0111c4de90ab7ab2016bc898fbfa4871293dbc6c0687d1c60319971d7c20fb8",
   "pins" : [
     {
       "identity" : "csv.swift",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "80605d41b4dbc568202d799d3b3d9bbb86f29e1e",
         "version" : "0.6.0"
+      }
+    },
+    {
+      "identity" : "sfera",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/csanfilippo/sfera.git",
+      "state" : {
+        "revision" : "b6bb70d554cf98395af9dcd1ecda2ac4479f7905",
+        "version" : "0.1.0"
       }
     },
     {
