@@ -24,6 +24,10 @@
 
 import Foundation
 
+enum StationExportError: Error, Equatable {
+    case noSourceAvailable
+}
+
 struct StationExporter {
     static func export(
         companies: Set<PetrolCompany>,
@@ -33,16 +37,30 @@ struct StationExporter {
         makeSource: @Sendable (PetrolCompany) -> any PetrolStationsSource = { $0.makeSource(session: .shared) }
     ) async throws -> Void {
         let sortedCompanies = companies.sorted(by: { $0.rawValue < $1.rawValue })
+        let unavailable = UnavailableCompanies()
 
         let stations = try await fetchAllFrom {
             for company in sortedCompanies {
-                ReportingStationsSource(wrapped: makeSource(company), company: company, reporter: reporter)
+                ReportingStationsSource(
+                    wrapped: SkippingUnavailableSource(wrapped: makeSource(company), company: company, unavailable: unavailable),
+                    company: company,
+                    reporter: reporter
+                )
             }
         }
-        
+
         let countsByBrand = Dictionary(grouping: stations, by: \.brand).mapValues(\.count)
+        let failures = await unavailable.failures
         for company in sortedCompanies {
-            await reporter.report("  \(company.displayName): \(countsByBrand[company] ?? 0)")
+            if let error = failures[company] {
+                await reporter.report("  \(company.displayName): skipped (\(error))")
+            } else {
+                await reporter.report("  \(company.displayName): \(countsByBrand[company] ?? 0)")
+            }
+        }
+
+        guard failures.count < sortedCompanies.count else {
+            throw StationExportError.noSourceAvailable
         }
 
         try serializerFor(format).save(stations: stations, into: output)
@@ -58,6 +76,29 @@ private struct ReportingStationsSource: PetrolStationsSource {
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
         await reporter.report("Fetching \(company.displayName) stations...")
         return try await wrapped.getAllPetrolStations()
+    }
+}
+
+private actor UnavailableCompanies {
+    private(set) var failures: [PetrolCompany: PetrolStationSourceError] = [:]
+
+    func record(_ error: PetrolStationSourceError, for company: PetrolCompany) {
+        failures[company] = error
+    }
+}
+
+private struct SkippingUnavailableSource: PetrolStationsSource {
+    let wrapped: any PetrolStationsSource
+    let company: PetrolCompany
+    let unavailable: UnavailableCompanies
+
+    func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {
+        do {
+            return try await wrapped.getAllPetrolStations()
+        } catch {
+            await unavailable.record(error, for: company)
+            return []
+        }
     }
 }
 

@@ -134,20 +134,82 @@ struct StationExporterTests {
         ])
     }
 
-    @Test("error thrown by a source propagates and nothing is written to output")
-    func errorFromSourcePropagatesWithoutWriting() async throws {
+    @Test("skips a failing source and exports the stations of the others")
+    func skipsFailingSourceAndExportsTheOthers() async throws {
         let output = RecordingOutput()
 
-        await #expect(throws: PetrolStationSourceError.serverError) {
+        try await StationExporter.export(
+            companies: [.shell, .oomco],
+            format: .csv,
+            output: output,
+            reporter: RecordingProgressReporter(),
+            makeSource: { company in
+                switch company {
+                case .shell:
+                    ThrowingSource(error: .serverError)
+                case .oomco, .almaha:
+                    DummySource(injectedStations: [
+                        .init(brand: .oomco, name: "Oomco1", location: .fixture(latitude: 2, longitude: 2))
+                    ])
+                }
+            }
+        )
+
+        #expect(output.saved == """
+            Name,Brand,Latitude,Longitude
+            Oomco1,Oman Oil,2.000000,2.000000
+            """)
+    }
+
+    @Test("reports a skipped source with its error in the summary")
+    func reportsSkippedSourceInSummary() async throws {
+        let reporter = RecordingProgressReporter()
+
+        try await StationExporter.export(
+            companies: [.shell, .oomco],
+            format: .csv,
+            output: RecordingOutput(),
+            reporter: reporter,
+            makeSource: { company in
+                switch company {
+                case .shell:
+                    ThrowingSource(error: .serverError)
+                case .oomco, .almaha:
+                    DummySource(injectedStations: [
+                        .init(brand: .oomco, name: "Oomco1", location: .fixture(latitude: 2, longitude: 2))
+                    ])
+                }
+            }
+        )
+
+        #expect(await reporter.messages.suffix(3) == [
+            "  Oman Oil: 1",
+            "  Shell: skipped (serverError)",
+            "Exported 1 stations to test-output"
+        ])
+    }
+
+    @Test("throws noSourceAvailable when every source fails, reporting each skip and writing nothing")
+    func throwsWhenEverySourceFails() async throws {
+        let reporter = RecordingProgressReporter()
+        let output = RecordingOutput()
+
+        await #expect(throws: StationExportError.noSourceAvailable) {
             try await StationExporter.export(
-                companies: [.shell],
+                companies: [.shell, .oomco],
                 format: .csv,
                 output: output,
-                reporter: RecordingProgressReporter(),
-                makeSource: { _ in ThrowingSource(error: .serverError) }
+                reporter: reporter,
+                makeSource: { company in
+                    ThrowingSource(error: company == .shell ? .serverError : .invalidData)
+                }
             )
         }
 
         #expect(output.saved == nil)
+        #expect(await reporter.messages.suffix(2) == [
+            "  Oman Oil: skipped (invalidData)",
+            "  Shell: skipped (serverError)"
+        ])
     }
 }

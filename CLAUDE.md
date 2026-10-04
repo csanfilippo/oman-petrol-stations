@@ -60,7 +60,12 @@ fan-out fetch across providers → merge → serialize → `Output`.
   picks `Stdout` when `--output-file-path` is omitted.
 - **`StationExporter`** is the only place that wires fetch → merge → serialize → output
   together and prints progress; it takes `Set<PetrolCompany>`, a `SerializationFormat`, and
-  an `Output` so it can be tested/composed without touching the CLI layer.
+  an `Output` so it can be tested/composed without touching the CLI layer. It owns the
+  partial-export policy: each source is wrapped in `SkippingUnavailableSource`, which turns
+  a `PetrolStationSourceError` into an empty result and records it, so the summary prints
+  `<Company>: skipped (<error>)`; only when *every* source fails does it throw
+  `StationExportError.noSourceAvailable` (nothing is written). `fetchAllFrom` itself stays
+  fail-fast.
 
 ## Testing conventions
 
