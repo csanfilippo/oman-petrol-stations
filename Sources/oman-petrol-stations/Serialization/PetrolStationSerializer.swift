@@ -22,11 +22,13 @@
  SOFTWARE.
  */
 
+import sfera
 import Foundation
 
-enum SerializationFormat {
+enum SerializationFormat: String, CaseIterable {
     case csv
     case kml
+    case geojson
 }
 
 protocol PetrolStationSerializer {
@@ -39,6 +41,8 @@ func serializerFor(_ format: SerializationFormat) -> any PetrolStationSerializer
         CSVPetrolStationSerializer()
     case .kml:
         KMLPetrolStationSerializer()
+    case .geojson:
+        GeoJSONPetrolStationSerializer()
     }
 }
 
@@ -120,4 +124,36 @@ final class CSVPetrolStationSerializer: PetrolStationSerializer {
     }
     
     private func format(_ value: Double) -> String { String(format: "%.6f", value) }
+}
+
+final class GeoJSONPetrolStationSerializer: PetrolStationSerializer {
+    func save(stations: [PetrolStation], into output: some Output) throws {
+        
+        let points = try stations.map { station -> Feature in
+            
+            let point: Geometry = .point(
+                try Position(
+                    latitude: station.location.latitude,
+                    longitude: station.location.longitude
+                )
+            )
+            
+            return Feature(
+                geometry: point,
+                properties: [
+                    "stationName": .string(station.name.capitalized(with: .current)),
+                    "brand": .string(station.brand.displayName)
+                ]
+            )
+        }
+        
+        let geoJSON: GeoJSON = .featureCollection(.init(points))
+        
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        
+        let data = try encoder.encode(geoJSON)
+        
+        try output.save(String(data: data, encoding: .utf8)!)
+    }
 }

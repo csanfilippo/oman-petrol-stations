@@ -27,11 +27,7 @@ import ArgumentParser
 
 extension SerializationFormat: ExpressibleByArgument {
     init?(argument: String) {
-        switch argument.lowercased() {
-        case "kml": self = .kml
-        case "csv": self = .csv
-        default: return nil
-        }
+        self.init(rawValue: argument.lowercased())
     }
 }
 
