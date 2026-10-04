@@ -37,6 +37,15 @@ OPTIONS:
   -h, --help              Show help information.
 ```
 
+# Behaviour
+
+* **Output to stdout.** Omit `--output-file-path` to write the export to stdout; progress and warnings go to stderr, so the output can be piped or redirected safely:
+  ```bash
+  swift run oman-petrol-stations --format geojson > stations.geojson
+  ```
+* **Unavailable providers are skipped.** If a provider can't be reached or returns unusable data, it's reported as `skipped` in the summary and the export continues with the others. The tool fails only when every requested provider is unavailable.
+* **Invalid stations are dropped.** Stations with unparseable or out-of-range coordinates are skipped with a warning.
+
 # Source of the data
 
 * [Oman Oil](https://www.oomco.com/station-search)

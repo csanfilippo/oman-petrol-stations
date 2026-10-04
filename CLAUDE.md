@@ -59,7 +59,9 @@ fan-out fetch across providers → merge → serialize → `Output`.
   `Stdout`) abstracts *where* the string goes; `output(for:)` in `OutputFactory.swift`
   picks `Stdout` when `--output-file-path` is omitted.
 - **`StationExporter`** is the only place that wires fetch → merge → serialize → output
-  together and prints progress; it takes `Set<PetrolCompany>`, a `SerializationFormat`, and
+  together and reports progress through `ExportProgressReporter` — `ConsoleProgressReporter`
+  writes to **stderr**, never stdout, because stdout carries the export itself when
+  `--output-file-path` is omitted; it takes `Set<PetrolCompany>`, a `SerializationFormat`, and
   an `Output` so it can be tested/composed without touching the CLI layer. It owns the
   partial-export policy: each source is wrapped in `SkippingUnavailableSource`, which turns
   a `PetrolStationSourceError` into an empty result and records it, so the summary prints
