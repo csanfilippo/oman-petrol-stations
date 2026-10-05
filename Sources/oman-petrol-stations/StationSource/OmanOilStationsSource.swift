@@ -46,7 +46,7 @@ struct OmanOilStationsSource: PetrolStationsSource {
     
     init(session: URLSession) {
         self.session = session
-        self.source = URL(string: "https://www.oomco.com/station-search")!
+        self.source = URL(string: "https://oomco.om/station-search")!
     }
     
     func getAllPetrolStations() async throws(PetrolStationSourceError) -> [PetrolStation] {

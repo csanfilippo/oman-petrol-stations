@@ -36,7 +36,7 @@ struct OmanOilStationsSourceTests {
         .replay(
             stubs: [
                 .get(
-                    "https://www.oomco.com/station-search",
+                    "https://oomco.om/station-search",
                     200,
                     ["Content-Type": "application/json"],
                     {
@@ -75,7 +75,7 @@ struct OmanOilStationsSourceTests {
         .replay(
             stubs: [
                 .get(
-                    "https://www.oomco.com/station-search",
+                    "https://oomco.om/station-search",
                     200,
                     ["Content-Type": "application/json"],
                     {
@@ -106,7 +106,7 @@ struct OmanOilStationsSourceTests {
         .replay(
             stubs: [
                 .get(
-                    "https://www.oomco.com/station-search",
+                    "https://oomco.om/station-search",
                     200,
                     ["Content-Type": "application/json"],
                     {
@@ -137,7 +137,7 @@ struct OmanOilStationsSourceTests {
         .replay(
             stubs: [
                 .get(
-                    "https://www.oomco.com/station-search",
+                    "https://oomco.om/station-search",
                     200,
                     ["Content-Type": "application/json"],
                     {
@@ -167,7 +167,7 @@ struct OmanOilStationsSourceTests {
         .replay(
             stubs: [
                 .get(
-                    "https://www.oomco.com/station-search",
+                    "https://oomco.om/station-search",
                     200,
                     ["Content-Type": "application/json"],
                     { "{ \"error\": \"not found\" }" }
@@ -189,7 +189,7 @@ struct OmanOilStationsSourceTests {
         "throws serverError on 5xx response",
         .replay(
             stubs: [
-                .get("https://www.oomco.com/station-search", 500, [:], { "" })
+                .get("https://oomco.om/station-search", 500, [:], { "" })
             ],
             matching: [.path],
             scope: .test

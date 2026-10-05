@@ -48,6 +48,6 @@ OPTIONS:
 
 # Source of the data
 
-* [Oman Oil](https://www.oomco.com/station-search)
+* [Oman Oil](https://oomco.om/station-search)
 * [Shell](https://shellretaillocator.geoapp.me/api/v2/locations/within_bounds?sw[]=18.626924&sw[]=50.890848&ne[]=23.434461&ne[]=60.932352&locale=en_OM&format=json)
 * [Al Maha](https://www.almaha.com.om/en/map)
