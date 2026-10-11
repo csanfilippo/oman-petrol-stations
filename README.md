@@ -12,6 +12,10 @@ Export results as CSV, KML, or GeoJSON for mapping and offline use.
 
 It fetches station information from public provider sources and normalizes it into easy-to-use formats. I created this tool after a trip to Oman to make road travel safer by knowing where fuel is available. If you find it useful or want features added, feel free to open an issue or a pull request. The tool is lightweight, runs locally, and is intended for personal, offline, or research use.
 
+# Map
+
+Browse every station on the map at **[calogerosanfilippo.it/oman-petrol-stations](https://calogerosanfilippo.it/oman-petrol-stations/)**: filter by brand, find your position, and get directions to a station. The data is refreshed weekly by a GitHub Action that runs this tool; the page itself lives in [`site/`](site/).
+
 # Usage
 ```bash
 git clone https://github.com/csanfilippo/oman-petrol-stations.git
@@ -23,7 +27,7 @@ OVERVIEW: Fetches petrol stations in Oman and exports them to a file.
 This tool downloads station data from multiple providers and serializes it into
 a chosen output format (KML, CSV, or GeoJSON)
 
-USAGE: oman-petrol-stations [--output-file-path <output-file-path>] [--format <format>] [--petrol-company-list <petrol-company-list>]
+USAGE: oman-petrol-stations [--output-file-path <output-file-path>] [--format <format>] [--petrol-company-list <petrol-company-list>] [--require-all-sources]
 
 OPTIONS:
   --output-file-path <output-file-path>
@@ -33,6 +37,8 @@ OPTIONS:
   --petrol-company-list <petrol-company-list>
                           Comma-separated list of petrol companies (default:
                           almaha,oomco,shell)
+  --require-all-sources   Fail without writing anything if any provider is
+                          unavailable, instead of exporting the others
   --version               Show the version.
   -h, --help              Show help information.
 ```
@@ -43,7 +49,7 @@ OPTIONS:
   ```bash
   swift run oman-petrol-stations --format geojson > stations.geojson
   ```
-* **Unavailable providers are skipped.** If a provider can't be reached or returns unusable data, it's reported as `skipped` in the summary and the export continues with the others. The tool fails only when every requested provider is unavailable.
+* **Unavailable providers are skipped.** If a provider can't be reached or returns unusable data, it's reported as `skipped` in the summary and the export continues with the others. The tool fails only when every requested provider is unavailable — or, with `--require-all-sources`, when any of them is.
 * **Invalid stations are dropped.** Stations with unparseable or out-of-range coordinates are skipped with a warning.
 
 # Source of the data
