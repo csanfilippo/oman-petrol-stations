@@ -76,6 +76,19 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
+.intro {
+  margin: -4px 0 10px;
+  color: var(--panel-muted);
+  font-size: 13px;
+}
+
+.noscript {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+}
+
 .status, .source {
   margin: 10px 0 0;
   color: var(--panel-muted);

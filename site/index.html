@@ -3,11 +3,42 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Oman Petrol Stations</title>
-  <meta name="description" content="Map of Oman Oil, Shell and Al Maha petrol stations in Oman.">
+  <title>Oman Petrol Stations Map – Oman Oil, Shell, Al Maha</title>
+  <meta name="description" content="Interactive map of every Oman Oil, Shell and Al Maha petrol station in Oman. Find the nearest fuel station, filter by brand and get directions. Updated weekly.">
+  <link rel="canonical" href="https://calogerosanfilippo.it/oman-petrol-stations/">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛽</text></svg>">
+  <meta name="theme-color" content="#2f3a46">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calogerosanfilippo.it/oman-petrol-stations/">
+  <meta property="og:title" content="Oman Petrol Stations Map">
+  <meta property="og:description" content="Every Oman Oil, Shell and Al Maha petrol station in Oman on one map. Find the nearest fuel and get directions.">
+  <meta name="twitter:card" content="summary">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "Petrol stations in Oman",
+    "description": "Locations of Oman Oil, Shell and Al Maha petrol stations in Oman, collected weekly from the providers' public station finders.",
+    "url": "https://calogerosanfilippo.it/oman-petrol-stations/",
+    "keywords": ["Oman", "petrol stations", "fuel stations", "Oman Oil", "Shell", "Al Maha", "GeoJSON"],
+    "spatialCoverage": { "@type": "Place", "name": "Oman" },
+    "isAccessibleForFree": true,
+    "creator": { "@type": "Person", "name": "Calogero Sanfilippo", "url": "https://calogerosanfilippo.it/" },
+    "distribution": [{
+      "@type": "DataDownload",
+      "encodingFormat": "application/geo+json",
+      "contentUrl": "https://calogerosanfilippo.it/oman-petrol-stations/stations.geojson"
+    }]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
-  <script src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
+  <script defer src="https://unpkg.com/maplibre-gl@5.6.0/dist/maplibre-gl.js"></script>
   <script type="module" src="map.js"></script>
   <script defer src="https://cloud.umami.is/script.js"
           data-website-id="0f53202d-3422-4b72-b84b-5101d530e567"
@@ -15,9 +46,14 @@
 </head>
 <body>
   <div id="map"></div>
+  <noscript>
+    <p class="noscript">This map needs JavaScript. You can still
+      <a href="stations.geojson">download every station as GeoJSON</a>.</p>
+  </noscript>
 
   <aside class="panel">
-    <h1>Oman petrol stations</h1>
+    <h1>Petrol stations in Oman</h1>
+    <p class="intro">Every Oman Oil, Shell and Al Maha station, refreshed weekly.</p>
     <ul id="brands" class="brands"></ul>
     <p id="status" class="status">Loading stations…</p>
     <p class="source">
