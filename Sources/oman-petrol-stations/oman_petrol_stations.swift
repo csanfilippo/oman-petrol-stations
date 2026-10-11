@@ -81,6 +81,9 @@ struct oman_petrol_stations: AsyncParsableCommand {
     
     @Option(help: "Comma-separated list of petrol companies")
     var petrolCompanyList: PetrolCompanyList = [.shell, .oomco, .almaha]
+
+    @Flag(help: "Fail without writing anything if any provider is unavailable, instead of exporting the others")
+    var requireAllSources = false
     
     mutating func run() async throws {
         
@@ -89,7 +92,8 @@ struct oman_petrol_stations: AsyncParsableCommand {
         try await StationExporter.export(
             companies: petrolCompanyList.companies,
             format: format,
-            output: output
+            output: output,
+            partialExport: requireAllSources ? .forbidden : .allowed
         )
     }
 }

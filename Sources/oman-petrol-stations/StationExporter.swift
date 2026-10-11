@@ -26,6 +26,12 @@ import Foundation
 
 enum StationExportError: Error, Equatable {
     case noSourceAvailable
+    case sourcesUnavailable(Set<PetrolCompany>)
+}
+
+enum PartialExportPolicy {
+    case allowed
+    case forbidden
 }
 
 struct StationExporter {
@@ -33,6 +39,7 @@ struct StationExporter {
         companies: Set<PetrolCompany>,
         format: SerializationFormat,
         output: some Output,
+        partialExport: PartialExportPolicy = .allowed,
         reporter: any ExportProgressReporter = ConsoleProgressReporter(),
         makeSource: @Sendable (PetrolCompany) -> any PetrolStationsSource = { $0.makeSource(session: .shared) }
     ) async throws -> Void {
@@ -61,6 +68,10 @@ struct StationExporter {
 
         guard failures.count < sortedCompanies.count else {
             throw StationExportError.noSourceAvailable
+        }
+
+        guard partialExport == .allowed || failures.isEmpty else {
+            throw StationExportError.sourcesUnavailable(Set(failures.keys))
         }
 
         try serializerFor(format).save(stations: stations, into: output)

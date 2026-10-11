@@ -212,4 +212,59 @@ struct StationExporterTests {
             "  Shell: skipped (serverError)"
         ])
     }
+
+    @Test("throws sourcesUnavailable when partial export is forbidden and a source fails, reporting the skip and writing nothing")
+    func throwsWhenPartialExportIsForbiddenAndASourceFails() async throws {
+        let reporter = RecordingProgressReporter()
+        let output = RecordingOutput()
+
+        await #expect(throws: StationExportError.sourcesUnavailable([.shell])) {
+            try await StationExporter.export(
+                companies: [.shell, .oomco],
+                format: .csv,
+                output: output,
+                partialExport: .forbidden,
+                reporter: reporter,
+                makeSource: { company in
+                    switch company {
+                    case .shell:
+                        ThrowingSource(error: .serverError)
+                    case .oomco, .almaha:
+                        DummySource(injectedStations: [
+                            .init(brand: .oomco, name: "Oomco1", location: .fixture(latitude: 2, longitude: 2))
+                        ])
+                    }
+                }
+            )
+        }
+
+        #expect(output.saved == nil)
+        #expect(await reporter.messages.suffix(2) == [
+            "  Oman Oil: 1",
+            "  Shell: skipped (serverError)"
+        ])
+    }
+
+    @Test("exports normally when partial export is forbidden and every source succeeds")
+    func exportsWhenPartialExportIsForbiddenAndEverySourceSucceeds() async throws {
+        let output = RecordingOutput()
+
+        try await StationExporter.export(
+            companies: [.oomco],
+            format: .csv,
+            output: output,
+            partialExport: .forbidden,
+            reporter: RecordingProgressReporter(),
+            makeSource: { _ in
+                DummySource(injectedStations: [
+                    .init(brand: .oomco, name: "Oomco1", location: .fixture(latitude: 2, longitude: 2))
+                ])
+            }
+        )
+
+        #expect(output.saved == """
+            Name,Brand,Latitude,Longitude
+            Oomco1,Oman Oil,2.000000,2.000000
+            """)
+    }
 }

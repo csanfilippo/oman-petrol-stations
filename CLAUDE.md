@@ -16,6 +16,7 @@ swift run oman-petrol-stations --help
 swift run oman-petrol-stations --output-file-path stations.kml --format kml
 swift run oman-petrol-stations --format csv --petrol-company-list shell,oomco   # omit --output-file-path to write to stdout
 swift run oman-petrol-stations --format geojson                                 # --format: kml (default), csv, geojson
+swift run oman-petrol-stations --require-all-sources                            # fail if any provider is unavailable
 
 swift test                                                              # run all tests
 swift test --filter ShellStationsSourceTests                           # run one suite
@@ -66,8 +67,10 @@ fan-out fetch across providers → merge → serialize → `Output`.
   partial-export policy: each source is wrapped in `SkippingUnavailableSource`, which turns
   a `PetrolStationSourceError` into an empty result and records it, so the summary prints
   `<Company>: skipped (<error>)`; only when *every* source fails does it throw
-  `StationExportError.noSourceAvailable` (nothing is written). `fetchAllFrom` itself stays
-  fail-fast.
+  `StationExportError.noSourceAvailable` (nothing is written). With
+  `PartialExportPolicy.forbidden` (CLI `--require-all-sources`) any skipped source throws
+  `StationExportError.sourcesUnavailable` after the summary, again writing nothing — meant
+  for unattended runs whose output is published. `fetchAllFrom` itself stays fail-fast.
 
 ## Testing conventions
 
