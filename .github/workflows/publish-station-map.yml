@@ -26,9 +26,9 @@ jobs:
     # macos-26 tops out at Xcode 26.x, which cannot build swift-tools-version 6.4.
     runs-on: xcode-27
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .build
           key: xcode27-spm-${{ hashFiles('Package.resolved') }}
@@ -44,9 +44,9 @@ jobs:
             --output-file-path site/stations.geojson \
             --require-all-sources
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
@@ -58,4 +58,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
