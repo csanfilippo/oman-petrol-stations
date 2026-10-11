@@ -1,0 +1,98 @@
+:root {
+  --panel-bg: rgba(255, 255, 255, 0.94);
+  --panel-fg: #1d232b;
+  --panel-muted: #5b6672;
+  --panel-border: rgba(0, 0, 0, 0.08);
+  --link: #1f6fbf;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --panel-bg: rgba(28, 32, 38, 0.94);
+    --panel-fg: #e8ecf0;
+    --panel-muted: #a3adb8;
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --link: #7db6f0;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #e9e5dc;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+}
+
+.panel {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 260px;
+  padding: 14px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--panel-fg);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.panel h1 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.brands {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brands label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  cursor: pointer;
+}
+
+.brands .swatch {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.brands .count {
+  margin-left: auto;
+  color: var(--panel-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.status, .source {
+  margin: 10px 0 0;
+  color: var(--panel-muted);
+  font-size: 12px;
+}
+
+.panel a { color: var(--link); }
+
+.station-popup strong { display: block; }
+.station-popup .brand { color: #5b6672; }
+.station-popup a { display: inline-block; margin-top: 6px; color: #1f6fbf; }
+
+@media (max-width: 480px) {
+  .panel {
+    top: auto;
+    right: 12px;
+    bottom: 28px;
+    width: auto;
+  }
+}

@@ -1,0 +1,61 @@
+name: Publish station map
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "Sources/**"
+      - "Package.resolved"
+      - ".github/workflows/publish-station-map.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # macos-26 tops out at Xcode 26.x, which cannot build swift-tools-version 6.4.
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/cache@v4
+        with:
+          path: .build
+          key: xcode27-spm-${{ hashFiles('Package.resolved') }}
+          restore-keys: xcode27-spm-
+
+      # --require-all-sources fails the job if any provider is down, so the last
+      # complete snapshot stays published instead of one missing a provider.
+      - name: Export stations snapshot
+        run: |
+          mkdir -p site
+          swift run -c release oman-petrol-stations \
+            --format geojson \
+            --output-file-path site/stations.geojson \
+            --require-all-sources
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

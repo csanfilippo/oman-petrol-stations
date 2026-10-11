@@ -71,6 +71,13 @@ fan-out fetch across providers → merge → serialize → `Output`.
   `PartialExportPolicy.forbidden` (CLI `--require-all-sources`) any skipped source throws
   `StationExportError.sourcesUnavailable` after the summary, again writing nothing — meant
   for unattended runs whose output is published. `fetchAllFrom` itself stays fail-fast.
+- **`site/`** — static map page (plain HTML/JS, no build step; MapLibre GL JS + OpenFreeMap
+  tiles) that renders `site/stations.geojson`. The snapshot is a build product (gitignored),
+  generated and deployed to GitHub Pages by `.github/workflows/publish-station-map.yml`
+  weekly with `--require-all-sources`, so a provider outage keeps the last complete snapshot
+  live. The page depends on the GeoJSON `stationName`/`brand` properties and on
+  `PetrolCompany.displayName` values for brand colours — renaming either is a breaking change.
+  Preview locally: `cd site && python3 -m http.server`.
 
 ## Testing conventions
 
