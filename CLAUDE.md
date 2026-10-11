@@ -96,3 +96,15 @@ fan-out fetch across providers → merge → serialize → `Output`.
 - Build test locations with `PetrolStation.Location.fixture(latitude:longitude:)`
   (`PetrolStationFixtures.swift`), which traps on invalid coordinates — the real init is
   failable and can't be used in `@Test(arguments:)` lists.
+
+## Changelog and releases
+
+- `CHANGELOG.md` follows Keep a Changelog. Every user-visible change to the CLI (flags,
+  output formats and their content, export behaviour, providers, toolchain requirements) adds
+  an entry under `## Unreleased` in the same change, grouped as Added, Changed, Fixed or
+  Removed. Breaking entries start with **Breaking:** and say how to migrate. Refactors,
+  tests, CI, the `site/` map page and documentation-only changes get no entry.
+- Tags are bare semantic versions (`1.4.0`, no `v` prefix), annotated, on a commit
+  (`bump version to <version>`) that updates `version:` in `oman_petrol_stations.swift` and
+  renames `## Unreleased` to `## <version> – <date>`; that section's text is the GitHub
+  release notes.
